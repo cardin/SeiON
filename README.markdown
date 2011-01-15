@@ -1,4 +1,4 @@
-               [[http://img141.imageshack.us/img141/671/seionlogo.png | align=center]]
+![The SeiON Actionscript3 Sound Library](http://img141.imageshack.us/img141/671/seionlogo.png)
 
 ### What is SeiON?
 SeiON is an Actionscript 3 Sound Library. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex. By instantiating Sound objects through SeiON, you can have a layered approach to handling your sound playback. SeiON also incorporates an sound allocation system so that you don't have to keep track of every single sound instance, and will automatically dispose of them once they finish playback. By properly categorising sounds, SeiON will be able to recycle sounds and ensure that you'll always be able to keep playing more sounds without hitting the SoundChannel limit for the Flash Player.
@@ -11,15 +11,18 @@ In short, SeiON does the following:
 * Keeps track of and auto-disposes finished/unwanted sound instances.
 * Recycles sounds for continual creation of more sounds.
 
-Visit the wiki for more details: https://github.com/cardin/SeiON/wiki/
+Visit the wiki for more details: <http://github.com/cardin/SeiON/wiki/>
 
---- THE ANIMATION LIBRARY
+-------------------------------------
+
+###About The Animation Library
 SeiON comes with GreenSock's Tweening Library, which can be used to chain animation events to SeiON internally. Usage of GreenSock is opt-in by initialising the engine at the start of the program.
 
-GreenSock's Tweening Library comes under its own license, and is free for non-commercial usage. You can visit http://www.greensock.com/licensing/ to learn more about it.
+GreenSock's Tweening Library comes under its own license, and is free for non-commercial usage. You can visit <http://www.greensock.com/licensing/> to learn more about it.
 
-------------------------------------------
-Licensed under the MIT License
+-------------------------------------
+
+####Licensed under the MIT License
 
 Copyright (C) 2011 by Cardin Lee
 
@@ -41,5 +44,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-https://github.com/cardin/SeiON
-http://www.opensource.org/licenses/mit-license.php
+<http://github.com/cardin/SeiON>
+<http://www.opensource.org/licenses/mit-license.php>
