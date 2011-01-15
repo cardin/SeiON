@@ -13,14 +13,14 @@ In short, SeiON does the following:
 
 Visit the wiki for more details: <http://github.com/cardin/SeiON/wiki/>
 
--------------------------------------
+* * *
 
 ###About The Animation Library
 SeiON comes with GreenSock's Tweening Library, which can be used to chain animation events to SeiON internally. Usage of GreenSock is opt-in by initialising the engine at the start of the program.
 
 GreenSock's Tweening Library comes under its own license, and is free for non-commercial usage. You can visit <http://www.greensock.com/licensing/> to learn more about it.
 
--------------------------------------
+* * *
 
 ####Licensed under the MIT License
 
@@ -45,4 +45,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 <http://github.com/cardin/SeiON>
+
 <http://www.opensource.org/licenses/mit-license.php>

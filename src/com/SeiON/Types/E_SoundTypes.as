@@ -1,10 +1,7 @@
 package com.SeiON.Types
 {
-<<<<<<< HEAD
 	import com.SeiON.SoundClip;
 	import com.SeiON.SoundMP3Loop;
-=======
->>>>>>> parent of 1ae3953... Removed duplicate folders
 	import com.SeiON.Misc.Enumerable;
 	
 	public class E_SoundTypes extends Enumerable
@@ -16,7 +13,6 @@ package com.SeiON.Types
 		/** An MP3 looping sound. */
 		public static const MP3_LOOP:E_SoundTypes = new E_SoundTypes();
 		
-<<<<<<< HEAD
 		internal static var _cls:Class;
 		
 		{
@@ -32,10 +28,6 @@ package com.SeiON.Types
 		public function get clsRef():Class
 		{
 			return _cls;
-=======
-		{
-			initEnum(E_SoundTypes);
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		}
 	}
 }

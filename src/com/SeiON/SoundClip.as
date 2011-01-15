@@ -1,23 +1,15 @@
 ﻿package com.SeiON
 {
-<<<<<<< HEAD
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
-=======
-	import flash.events.Event;
->>>>>>> parent of 1ae3953... Removed duplicate folders
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
-<<<<<<< HEAD
 	import com.SeiON.Misc.CountDown;
 	import com.SeiON.Tween.ITween;
-=======
-	import com.greensock.TimelineMax;
-	import com.greensock.TweenLite;
->>>>>>> parent of 1ae3953... Removed duplicate folders
 	
 	/**
 	 * Our Audio Library's fundamental concept of a playable sound object. Contains internal
@@ -27,6 +19,8 @@
 	 */
 	public class SoundClip implements ISoundControl
 	{
+		public static const SOUND_REPEAT:String = "Event.SOUND_REPEAT";
+		
 		/** -- Sound Assets --
 		 * sound: Flash Native sound object, is a memory link to a specific audio waveform
 		 * soundChannel: Flash Native sound playback control, created when playing Sound objects
@@ -34,6 +28,7 @@
 		 * _volume: Values between 0.0 - 1.0, they represent the adjustable range of the sound
 		 * _pan: Values between -1.0 - 0.0, they represent the adjustable panning of the sound
 		 *
+		 * _dispatcher: The place to listen for events from SoundClip.
 		 * _repeat: How many more times the sound has to repeat itself.
 		 * pausedLocation: Where the sound was paused, so you can pause()/resume()
 		 * _tween: For animation of sound properties
@@ -45,24 +40,19 @@
 		protected var _volume:Number = 1.0;
 		protected var _pan:Number = 0;
 		
+		private var _dispatcher:EventDispatcher;
 		private var _repeat:int;
 		private var pausedLocation:Number = -1;
-<<<<<<< HEAD
 		protected var _tween:ITween;
 		private var truncation:CountDown;
-=======
-		protected var _tween:TimelineMax;
-		private var truncation:TweenLite;
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		
 		/** -- Manager vars --
-		 * manager: the SoundGroup that this SoundClip belongs to
+		 * _manager: the SoundGroup that this SoundClip belongs to
 		 * autodispose: If true, this SoundGroup shall be auto-disposed
 		 * spareAllocation: Used by SoundManager to check if this clip was borrowed from SoundMaster
 		 */
-		protected var manager:SoundGroup;
+		protected var _manager:SoundGroup;
 		protected var autodispose:Boolean;
-<<<<<<< HEAD
 		private var _spareAllocation:Boolean;
 		
 		/**
@@ -79,79 +69,49 @@
 		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
-			if (secretKey != manager.killSound)
+			if (secretKey != _manager.killSound)
 				throw new IllegalOperationError("ISoundClip's constructor not allowed for direct "
 				+ "access! Please use SoundGroup.createSound() instead."
 			
-=======
-		internal var spareAllocation:Boolean = false;
-		
-		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
-								autodispose:Boolean = true)
-		{
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			// Flash Sound characteristics
 			this.sound = snd;
 			this.sndProperties = sndProperties;
 			this._repeat = sndProperties.repeat;
 			
 			// Parent control
-			this.manager = manager;
+			this._manager = manager;
 			this.autodispose = autodispose;
-<<<<<<< HEAD
 			this._spareAllocation = spareAllocation;
 			
 			_tween = new SoundMaster.tweenCls() as ITween;
 			_tween.play();
-=======
-			
-			_tween = new TimelineMax();
-			_tween.stop();
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			if (autodispose) //autodispose sounds will autoplay
 				play();
 		}
 		
-<<<<<<< HEAD
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
-=======
-		/**
-		 * Disposes.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function dispose():void
 		{
 			stop();
 			
-<<<<<<< HEAD
+			_dispatcher = null;
 			_tween.dispose();
 			_tween = null;
 			
 			// truncation.stop() alrdy done in super().dispose's stop() above
-=======
-			_tween = null;
-			
-			// truncation.kill() alrdy done in super().dispose's stop() above
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			truncation = null;
 			
 			sound = null;
 			sndProperties.dispose();
 			sndProperties = null;
-			manager.killSound(this);
-			manager = null;
+			_manager.killSound(this);
+			_manager = null;
 		}
 		
 		// ---------------------------------- PLAYBACK CONTROLS ----------------------------
 		
-<<<<<<< HEAD
 		/** Plays the sound from the beginning again. (ISoundClip) */
-=======
-		/**
-		 * Plays the sound from the beginning again.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function play():void
 		{
 			stop(); // for safety's sake
@@ -165,28 +125,18 @@
 			
 			// setting up truncation
 			var playtime:Number = sound.length - sndProperties.offset - sndProperties.truncate;
-<<<<<<< HEAD
 			truncation = new CountDown(playtime);
 			truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
-=======
-			truncation = TweenLite.delayedCall(playtime / 1000, onSoundComplete);
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			// start tween animation
 			_tween.restart();
 			
-			// We won't play if our manager is paused
-			if (manager.isPaused())
+			// We won't play if our Manager is paused
+			if (_manager.isPaused())
 				pause();
 		}
 		
-<<<<<<< HEAD
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
-=======
-		/**
-		 * Stops the sound and resets it to Zero.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function stop():void
 		{
 			if (isPlaying() || isPaused())
@@ -198,7 +148,6 @@
 					soundChannel = null;
 				}
 				// reset variables
-<<<<<<< HEAD
 				if (truncation) // 'cos we call stop() before play(), so possibly truncation == null @ this point
 				{
 					truncation.stop();
@@ -206,26 +155,18 @@
 				}
 				_tween.stop();
 				
-=======
-				if (truncation) // 'cos we call stop() before play(), so truncation == null @ this point
-					truncation.kill();
->>>>>>> parent of 1ae3953... Removed duplicate folders
 				pausedLocation = -1;
 				_repeat = sndProperties.repeat;
 			}
 		}
 		
-<<<<<<< HEAD
 		/** Resumes playback of sound. (ISoundControl) */
-=======
-		// ISoundControl
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function resume():void
 		{
 			// ----- Code is adapated from play()
 			
 			// if manager is paused, no resuming allowed!
-			if (manager.isPaused())	return;
+			if (_manager.isPaused())	return;
 			
 			// resume is only valid if it were paused in the 1st place
 			if (isPaused())
@@ -247,11 +188,7 @@
 			}
 		}
 		
-<<<<<<< HEAD
 		/** Pauses playback of sound. (ISoundControl) */
-=======
-		// ISoundControl
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function pause():void
 		{
 			if (isPlaying())
@@ -266,27 +203,17 @@
 			}
 		}
 		
-<<<<<<< HEAD
 		// ----------------------------------- PROPERTIES ---------------------------------
+		/** Read-only. Returns the manager that holds this ISoundClip. */
+		public function get manager():SoundGroup {	return _manager;	}
 		
-		/**
-		 * Used by SoundManager to check if this clip was borrowed from SoundMaster.
-		 *
-		 * ISoundClip
-		 */
-		public function get spareAllocation():Boolean
-		{
-			return _spareAllocation;
-		}
+		/** Read-only. Used by SoundManager to check if this clip was borrowed from SoundMaster. (ISoundClip) */
+		public function get spareAllocation():Boolean {		return _spareAllocation;	}
 		
-		/** Is the sound active? (ISoundControl) */
-=======
-		// ------------------------------- CHECKING METHODS -------------------------------
+		/** Read-only. Fires off Event.SOUND_COMPLETE and/or SoundClip.SOUND_REPEAT. (ISoundControl) */
+		public function get dispatcher():EventDispatcher {	return _dispatcher;	}
 		
-		/**
-		 * Whether the sound is playing right now.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
+		/** Is the sound active? (ISoundClip) */
 		public function isPlaying():Boolean
 		{
 			if (soundChannel)
@@ -294,11 +221,7 @@
 			return false;
 		}
 		
-<<<<<<< HEAD
 		/** Is the playback paused? (ISoundControl) */
-=======
-		// ISoundControl
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function isPaused():Boolean
 		{
 			if (pausedLocation == -1)
@@ -306,18 +229,12 @@
 			return true;
 		}
 		
-<<<<<<< HEAD
 		/**
-		 * Get: The volume as affected by SoundGroup (parent).
+		 * Get: The volume as affected by its parent.
 		 * Set: The personal adjustable volume unaffected by anything.
 		 *
 		 * ISoundControl
 		 */
-=======
-		// ----------------------------------- PROPERTIES ---------------------------------
-		
-		// ISoundControl
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function get volume():Number {	return _volume;	}
 		public function set volume(value:Number):void
 		{
@@ -327,21 +244,17 @@
 				var st:SoundTransform = soundChannel.soundTransform;
 				
 				// final Volume = native Volume * current Volume * parent's volume
-				st.volume = sndProperties.sndTransform.volume * _volume * manager.volume;
+				st.volume = sndProperties.sndTransform.volume * _volume * _manager.volume;
 				soundChannel.soundTransform = st;
 			}
 		}
 		
-<<<<<<< HEAD
 		/**
-		 * Get: The panning as affected by SoundGroup (parent).
+		 * Get: The panning as affected by its parent.
 		 * Set: The personal adjustable panning unaffected by anything.
 		 *
 		 * ISoundControl
 		 */
-=======
-		// ISoundControl
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function get pan():Number {	return _pan; }
 		public function set pan(value:Number):void
 		{
@@ -356,32 +269,17 @@
 				st.pan = amtToMove + sndProperties.sndTransform.pan;
 				
 				//adding on the parent's panning
-				desiredDir = (manager.pan > 0) ? 1 : -1;
-				amtToMove = (desiredDir - st.pan) * Math.abs(manager.pan);
+				desiredDir = (_manager.pan > 0) ? 1 : -1;
+				amtToMove = (desiredDir - st.pan) * Math.abs(_manager.pan);
 				st.pan = amtToMove + st.pan;
 				
 				soundChannel.soundTransform = st;
 			}
 		}
 		
-<<<<<<< HEAD
 		/** The animation pegged to playback. (ISoundControl) */
 		public function get tween():ITween {	return _tween; }
 		public function set tween(value:ITween):void
-=======
-		/**
-		 * A tween that is tied into the controls. It might not be very accurate, if the sound
-		 * is an external non-looping track.
-		 * Use this as you would filters = []. (eg. reassign the whole TimelineMax back)
-		 *
-		 * NOTE: If you need to pause the tween at the specific instance, please do. The Tween
-		 * will resume() instantly after you give it to SoundClip.
-		 *
-		 * ISoundControl
-		 */
-		public function get tween():TimelineMax {	return _tween; }
-		public function set tween(value:TimelineMax):void
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		{
 			_tween = value;
 			if (isPaused())
@@ -390,27 +288,20 @@
 				_tween.resume();
 		}
 		
-		/**
+		/** Read-only
 		 * Returns the sound properties of the sound. Eg. Full Repeat times, offset, truncate.
 		 *
-<<<<<<< HEAD
 		 * NOTE: You're given a cloned copy. Remember to call dispose() to facilitate GC disposal.
 		 *
 		 * ISoundClip
-=======
-		 * NOTE: This is a cloned copy. Remember to call dispose() to facilitate GC disposal.
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		 */
 		public function get soundProperties():SoundProperties	{	return sndProperties.clone();	}
 		
 		/**
-		 * How many more times the SoundClip has to repeat itself. A value of -1 means that this
+		 * How many more times the ISoundClip has to repeat itself. A value of -1 means that this
 		 * is not going to repeat anymore.
-<<<<<<< HEAD
 		 *
 		 * ISoundClip
-=======
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		 */
 		public function get repeat():int	{	return _repeat;	}
 		public function set repeat(value:int):void
@@ -419,6 +310,18 @@
 				value = sndProperties.repeat;
 			
 			_repeat = value;
+		}
+		
+		/** Read-only. The total length of the clip. In Milliseconds. (ISoundClip) */
+		public function get length():Number
+		{
+			return sound.length - sndProperties.offset - sndProperties.truncate;
+		}
+		
+		/** Read-only. The amount of time remaining in this cycle. In Milliseconds. (ISoundClip) */
+		public function get remainingTime():Number
+		{
+			return sound.length - sndProperties.truncate - soundChannel.position;
 		}
 		
 		// -------------------------------- PRIVATE HELPER METHODS --------------------------
@@ -430,18 +333,25 @@
 		 */
 		protected function onSoundComplete(e:Event = null):void
 		{
+			if (e)	e.stopImmediatePropagation();
+			
 			if (repeat > 0) // repeating
 			{
 				var tempRepeatTrack:int = -- repeat;
 				if (tempRepeatTrack == 0)	tempRepeatTrack = -1; // the last time
 				
 				play();
+				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
 				repeat = tempRepeatTrack; // 'cos play() resets the repeat variable
 			}
 			else if (repeat == 0) // infinite loop
+			{
 				play();
+				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
+			}
 			else // disposing
 			{
+				_dispatcher.dispatchEvent(new Event(Event.SOUND_COMPLETE));
 				stop();
 				if (autodispose)
 					dispose();

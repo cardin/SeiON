@@ -39,7 +39,6 @@ package com.SeiON
 		private var samplesPosition:int = 0;
 		
 		public function SoundMP3Loop(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
-<<<<<<< HEAD
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
 			super(manager, snd, sndProperties, autodispose, spareAllocation, secretKey);
@@ -47,17 +46,6 @@ package com.SeiON
 		}
 		
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
-=======
-								autodispose:Boolean = true)
-		{
-			super(manager, snd, sndProperties, autodispose);
-			samplesTotal = sndProperties.samples; // make local, for faster access
-		}
-		
-		/**
-		 * Disposes.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		override public function dispose():void
 		{
 			super.dispose();
@@ -65,18 +53,29 @@ package com.SeiON
 		}
 		
 		// ---------------------------------- PROPERTIES ---------------------------------
-		/**
-		 * The time in MilliSeconds, of the silence padding that'd been added in the MP3.
-		 */
+		/** Read-only. The silence padding that's added in the MP3. In Milliseconds. */
 		public function get silenceTime():Number
 		{
-			var totalModdedSample:int = samplesTotal + MAGIC_DELAY;
-			var percentIsSilence:Number = MAGIC_DELAY / totalModdedSample;
+			var fatTotal:int = samplesTotal + MAGIC_DELAY;
+			var percentIsSilence:Number = MAGIC_DELAY / fatTotal;
 			return sound.length * percentIsSilence;
 		}
 		
+		/** Read-only. The total length of the clip. In Milliseconds. (ISoundClip) */
+		override public function get length():Number
+		{
+			// calculate % of actual Sample against padded Samples
+			var fatTotal:int = samplesTotal + MAGIC_DELAY;
+			return samplesTotal / fatTotal * sound.length;
+		}
+		
+		/** Read-only. The amount of time remaining in this cycle. In Milliseconds. (ISoundClip) */
+		override public function get remainingTime():Number
+		{
+			return length * (1 - samplesPosition / samplesTotal);
+		}
+		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
-<<<<<<< HEAD
 		
 		/** Plays the sound from the beginning again. (ISoundClip) */
 		override public function play():void
@@ -87,17 +86,6 @@ package com.SeiON
 			 * 	2. See @@ markers
 			 */
 			
-=======
-		/**
-		 * Plays the sound from the beginning again.
-		 *
-		 * Adapted from SoundClip.play(), changelog:
-		 *  1. Changed "starting up the sound" to reflect "out" variable
-		 * 	2. See @@ markers
-		 */
-		override public function play():void
-		{
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			stop(); // for safety's sake
 			
 			// starting up the sound
@@ -118,13 +106,7 @@ package com.SeiON
 				pause();
 		}
 		
-<<<<<<< HEAD
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
-=======
-		/**
-		 * Stops the sound and resets it to Zero.
-		 */
->>>>>>> parent of 1ae3953... Removed duplicate folders
 		override public function stop():void
 		{
 			super.stop();
@@ -133,7 +115,6 @@ package com.SeiON
 			out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
 		}
 		
-<<<<<<< HEAD
 		/** Resumes playback of sound. (ISoundControl) */
 		override public function resume():void
 		{
@@ -144,18 +125,6 @@ package com.SeiON
 			 *
 			 * ----- Code is adapated from play()
 			 */
-=======
-		/**
-		 * ISoundControl
-		 *
-		 * Adapted from SoundClip.resume(), changelog:
-		 *  1. Changed "starting up the sound" to reflect "out" variable
-		 *  2. See @@
-		 */
-		override public function resume():void
-		{
-			// ----- Code is adapated from play()
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			// if manager is paused, no resuming allowed!
 			if (manager.isPaused())	return;
@@ -178,7 +147,6 @@ package com.SeiON
 			}
 		}
 		
-<<<<<<< HEAD
 		/** Pauses playback of sound. (ISoundControl) */
 		override public function pause():void
 		{
@@ -188,18 +156,6 @@ package com.SeiON
 			 *  2. Removed soundChannel's unnecessary EventListener
 			 *  3. Removed truncation stuff
 			 */
-=======
-		/**
-		 * ISoundControl
-		 *
-		 * Adapted from SoundClip.pause(), changelog:
-		 *  1. Removed pausedLocation stuff
-		 *  2. Removed soundChannel's unnecessary EventListener
-		 *  3. Removed truncation stuff
-		 */
-		override public function pause():void
-		{
->>>>>>> parent of 1ae3953... Removed duplicate folders
 			if (isPlaying())
 			{
 				soundChannel.stop();
@@ -265,7 +221,6 @@ package com.SeiON
 		/**
 		 * To be called whenever we play finish one loop
 		 * @param	e	Useless
-<<<<<<< HEAD
 		 */
 		override protected function onSoundComplete(e:Event = null):void
 		{
@@ -277,28 +232,29 @@ package com.SeiON
 			 *
 			 * After all, we only interfere if we want to end the loop. Else continue.
 			 */
-=======
-		 *
-		 * NOTE: This is adapted from super.onSoundComplete(), with the following changes:
-		 * 	1. Removed infinite loop condition.
-		 *  2. play() & associated code removed.
-		 *  3. Added _tween handling, since play() no longer does it for us.
-		 *
-		 * After all, we only interfere if we want to end the loop. Else continue.
-		 */
-		override protected function onSoundComplete(e:Event = null):void
-		{
->>>>>>> parent of 1ae3953... Removed duplicate folders
+			if (e)	e.stopImmediatePropagation();
+			
 			if (repeat > 0) // repeating
 			{
-				-- repeat;
-				if (repeat == 0)	repeat = -1; // the last time
+				var tempRepeatTrack:int = -- repeat;
+				if (tempRepeatTrack == 0)	tempRepeatTrack = -1; // the last time
+				
+				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
+				repeat = tempRepeatTrack; // 'cos play() resets the repeat variable
+				
+				// Resynchronise _tween again, since we don't know the exact length of this sound
+				_tween.restart();
+			}
+			else if (repeat == 0) // infinite loop
+			{
+				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
 				
 				// Resynchronise _tween again, since we don't know the exact length of this sound
 				_tween.restart();
 			}
 			else // disposing
 			{
+				_dispatcher.dispatchEvent(new Event(Event.SOUND_COMPLETE));
 				stop();
 				if (autodispose)
 					dispose();
