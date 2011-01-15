@@ -1,6 +1,10 @@
 package com.SeiON
 {
+<<<<<<< HEAD
 	import com.SeiON.Tween.ITween;
+=======
+	import com.greensock.TimelineMax;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	
 	/**
 	 * Basic features that a sound object should have.
@@ -41,10 +45,16 @@ package com.SeiON
 		/**
 		 * A tween that is tied into the controls.
 		 * You can use it to generate cross-fading, delay playback etc.
+<<<<<<< HEAD
 		 *
 		 * If you're planning to swap out the
 		 */
 		function get tween():ITween;
 		function set tween(value:ITween):void;
+=======
+		 */
+		function get tween():TimelineMax;
+		function set tween(value:TimelineMax):void;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	}
 }

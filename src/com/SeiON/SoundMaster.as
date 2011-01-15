@@ -1,5 +1,6 @@
 package com.SeiON
 {
+<<<<<<< HEAD
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 	
@@ -12,11 +13,24 @@ package com.SeiON
 	 *
 	 * SoundMaster is pretty much THE Flash Player's sound control. Remember to instantiate the
 	 * tweening library you want as early as possible to avoid problems switching later.
+=======
+	import com.greensock.TimelineMax;
+	/**
+	 * 1. Controls all sounds in the program.
+	 * 2. Tracks and rations sound instances allocation in the Flash Player.
+	 *
+	 * SoundMaster is pretty much THE Flash Player's sound control. Rely on SoundGroup for
+	 * more intricate control; do not abuse SoundMaster by creating a secondary external control
+	 * system.
+	 *
+	 * In other words, beyond the Document Class, there should be little need to touch SoundMaster.
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	 *
 	 * @see	SoundGroup
 	 */
 	public final class SoundMaster implements ISoundControl
 	{
+<<<<<<< HEAD
 		/** Static handler to itself */
 		public static const _this:SoundMaster = new SoundMaster();
 		/* Specifies the tweening class that will be used */
@@ -33,6 +47,22 @@ package com.SeiON
 		
 		/** -- Standard ISoundControl Variables --
 		 * _pause: Whether the sound object is paused or not.
+=======
+		public static const _this:SoundMaster = new SoundMaster();
+		
+		/** -- Collection --
+		 * soundGroup: The collection of all SoundGroups that exist
+		 * fullAllocation: The complete available number of instances possible
+		 * allocation: Remaining number of Sound instances that can ever be created
+		 */
+		private static const soundGroup:Vector.<SoundGroup> = new Vector.<SoundGroup>();
+		public static const fullAllocation:uint = 32;
+		private static var allocation:uint = 32;
+		
+		/** -- Standard ISoundControl Variables --
+		 * _pause: Whether the sound object is paused or not. We need its own variable since
+		 * 			SoundMaster does not have any indication of it is paused or not.
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		 * _volume: The adjustable volume level of the sound object
 		 * _pan: The adjustable panning of the sound object
 		 * _tween: An animation for SoundMaster's properties
@@ -40,6 +70,7 @@ package com.SeiON
 		private static var _pause:Boolean = false;
 		private static var _volume:Number = 1.0;
 		private static var _pan:Number = 0;
+<<<<<<< HEAD
 		private static var _tween:ITween;
 		
 		// Static Initialiser
@@ -79,6 +110,11 @@ package com.SeiON
 		// ------------------------------- PLAYBACK CONTROLS ---------------------------
 		
 		/** Resumes playback of all sounds. (ISoundControl) */
+=======
+		private static var _tween:TimelineMax = new TimelineMax();
+		
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function resume():void
 		{
 			_pause = false;
@@ -88,7 +124,11 @@ package com.SeiON
 				sg.resume();
 		}
 		
+<<<<<<< HEAD
 		/** Pauses playback of all sounds. (ISoundControl) */
+=======
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function pause():void
 		{
 			_pause = true;
@@ -98,6 +138,7 @@ package com.SeiON
 				sg.pause();
 		}
 		
+<<<<<<< HEAD
 		// --------------------------------- PROPERTIES ---------------------------------
 		/** Is playback paused? (ISoundControl) */
 		public function isPaused():Boolean {	return _pause;	}
@@ -113,6 +154,23 @@ package com.SeiON
 		/** The animation pegged to playback (ISoundControl) */
 		public function get tween():ITween	{	return _tween;	}
 		public function set tween(value:ITween):void
+=======
+		// ISoundControl
+		public function isPaused():Boolean {	return _pause;	}
+		
+		// --------------------------------- PROPERTIES ---------------------------------
+		// ISoundControl
+		public function get volume():Number {	return _volume;	}
+		public function set volume(value:Number):void {		_volume = value;	}
+		
+		// ISoundControl
+		public function get pan():Number {	return _pan;	}
+		public function set pan(value:Number):void {	_pan = value;	}
+		
+		// ISoundControl
+		public function get tween():TimelineMax {	return _tween;	}
+		public function set tween(value:TimelineMax):void
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		{
 			_tween = value;
 			if (this.isPaused())
@@ -121,9 +179,16 @@ package com.SeiON
 				_tween.resume();
 		}
 		
+<<<<<<< HEAD
 		/** Discovers how many allocations are left available. */
 		public static function get availAllocation():uint		{	return allocation; }
 		/** Discovers the total allocation for sounds in the Flash Player. */
+=======
+		/**
+		 * Discovers the available allocation.
+		 */
+		public static function get availAllocation():uint		{	return allocation; }
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public static function get completeAllocation():uint	{	return fullAllocation;	}
 		
 		// ----------------------------- COLLECTION MANAGEMENT --------------------------
@@ -150,10 +215,17 @@ package com.SeiON
 				return null;
 			
 			// aligning SoundGroup to our orientations
+<<<<<<< HEAD
 			var sg:SoundGroup = new SoundGroup(allocatedAmt, killSoundGroup);
 			if (_this.isPaused())
 				sg.pause();
 			sg.volume = 1;
+=======
+			var sg:SoundGroup = new SoundGroup(allocatedAmt, null);
+			if (_this.isPaused())
+				sg.pause();
+			sg.volume = _volume;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			// insert into collection
 			soundGroup.push(sg);
@@ -166,7 +238,10 @@ package com.SeiON
 		internal static function killSoundGroup(sg:SoundGroup):void
 		{
 			soundGroup.splice(soundGroup.indexOf(sg), 1);
+<<<<<<< HEAD
 			allocation += sg.completeAllocation;
+=======
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		}
 		
 		/**
@@ -176,10 +251,15 @@ package com.SeiON
 		 * What it does depends on the param "returnAllocation".
 		 *
 		 * @param	returnAllocation	True is to return back a borrowed allocation.
+<<<<<<< HEAD
 		 *
 		 * @return	If we're trying to borrow allocation, returns true if borrowing is successful.
 		 */
 		internal static function getSpareAllocation(returnAllocation:Boolean = false):Boolean
+=======
+		 */
+		public static function getSpareAllocation(returnAllocation:Boolean = false):Boolean
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		{
 			// return allocation
 			if (returnAllocation)

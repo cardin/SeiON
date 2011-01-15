@@ -1,14 +1,23 @@
 ﻿package com.SeiON
 {
+<<<<<<< HEAD
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
+=======
+	import flash.events.Event;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+<<<<<<< HEAD
 	import com.SeiON.Misc.CountDown;
 	import com.SeiON.Tween.ITween;
+=======
+	import com.greensock.TimelineMax;
+	import com.greensock.TweenLite;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	
 	/**
 	 * Our Audio Library's fundamental concept of a playable sound object. Contains internal
@@ -38,8 +47,13 @@
 		
 		private var _repeat:int;
 		private var pausedLocation:Number = -1;
+<<<<<<< HEAD
 		protected var _tween:ITween;
 		private var truncation:CountDown;
+=======
+		protected var _tween:TimelineMax;
+		private var truncation:TweenLite;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		
 		/** -- Manager vars --
 		 * manager: the SoundGroup that this SoundClip belongs to
@@ -48,6 +62,7 @@
 		 */
 		protected var manager:SoundGroup;
 		protected var autodispose:Boolean;
+<<<<<<< HEAD
 		private var _spareAllocation:Boolean;
 		
 		/**
@@ -68,6 +83,13 @@
 				throw new IllegalOperationError("ISoundClip's constructor not allowed for direct "
 				+ "access! Please use SoundGroup.createSound() instead."
 			
+=======
+		internal var spareAllocation:Boolean = false;
+		
+		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
+								autodispose:Boolean = true)
+		{
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			// Flash Sound characteristics
 			this.sound = snd;
 			this.sndProperties = sndProperties;
@@ -76,24 +98,42 @@
 			// Parent control
 			this.manager = manager;
 			this.autodispose = autodispose;
+<<<<<<< HEAD
 			this._spareAllocation = spareAllocation;
 			
 			_tween = new SoundMaster.tweenCls() as ITween;
 			_tween.play();
+=======
+			
+			_tween = new TimelineMax();
+			_tween.stop();
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			if (autodispose) //autodispose sounds will autoplay
 				play();
 		}
 		
+<<<<<<< HEAD
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
+=======
+		/**
+		 * Disposes.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function dispose():void
 		{
 			stop();
 			
+<<<<<<< HEAD
 			_tween.dispose();
 			_tween = null;
 			
 			// truncation.stop() alrdy done in super().dispose's stop() above
+=======
+			_tween = null;
+			
+			// truncation.kill() alrdy done in super().dispose's stop() above
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			truncation = null;
 			
 			sound = null;
@@ -105,7 +145,13 @@
 		
 		// ---------------------------------- PLAYBACK CONTROLS ----------------------------
 		
+<<<<<<< HEAD
 		/** Plays the sound from the beginning again. (ISoundClip) */
+=======
+		/**
+		 * Plays the sound from the beginning again.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function play():void
 		{
 			stop(); // for safety's sake
@@ -119,8 +165,12 @@
 			
 			// setting up truncation
 			var playtime:Number = sound.length - sndProperties.offset - sndProperties.truncate;
+<<<<<<< HEAD
 			truncation = new CountDown(playtime);
 			truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
+=======
+			truncation = TweenLite.delayedCall(playtime / 1000, onSoundComplete);
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			// start tween animation
 			_tween.restart();
@@ -130,7 +180,13 @@
 				pause();
 		}
 		
+<<<<<<< HEAD
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
+=======
+		/**
+		 * Stops the sound and resets it to Zero.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function stop():void
 		{
 			if (isPlaying() || isPaused())
@@ -142,6 +198,7 @@
 					soundChannel = null;
 				}
 				// reset variables
+<<<<<<< HEAD
 				if (truncation) // 'cos we call stop() before play(), so possibly truncation == null @ this point
 				{
 					truncation.stop();
@@ -149,12 +206,20 @@
 				}
 				_tween.stop();
 				
+=======
+				if (truncation) // 'cos we call stop() before play(), so truncation == null @ this point
+					truncation.kill();
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 				pausedLocation = -1;
 				_repeat = sndProperties.repeat;
 			}
 		}
 		
+<<<<<<< HEAD
 		/** Resumes playback of sound. (ISoundControl) */
+=======
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function resume():void
 		{
 			// ----- Code is adapated from play()
@@ -182,7 +247,11 @@
 			}
 		}
 		
+<<<<<<< HEAD
 		/** Pauses playback of sound. (ISoundControl) */
+=======
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function pause():void
 		{
 			if (isPlaying())
@@ -197,6 +266,7 @@
 			}
 		}
 		
+<<<<<<< HEAD
 		// ----------------------------------- PROPERTIES ---------------------------------
 		
 		/**
@@ -210,6 +280,13 @@
 		}
 		
 		/** Is the sound active? (ISoundControl) */
+=======
+		// ------------------------------- CHECKING METHODS -------------------------------
+		
+		/**
+		 * Whether the sound is playing right now.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function isPlaying():Boolean
 		{
 			if (soundChannel)
@@ -217,7 +294,11 @@
 			return false;
 		}
 		
+<<<<<<< HEAD
 		/** Is the playback paused? (ISoundControl) */
+=======
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function isPaused():Boolean
 		{
 			if (pausedLocation == -1)
@@ -225,12 +306,18 @@
 			return true;
 		}
 		
+<<<<<<< HEAD
 		/**
 		 * Get: The volume as affected by SoundGroup (parent).
 		 * Set: The personal adjustable volume unaffected by anything.
 		 *
 		 * ISoundControl
 		 */
+=======
+		// ----------------------------------- PROPERTIES ---------------------------------
+		
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function get volume():Number {	return _volume;	}
 		public function set volume(value:Number):void
 		{
@@ -245,12 +332,16 @@
 			}
 		}
 		
+<<<<<<< HEAD
 		/**
 		 * Get: The panning as affected by SoundGroup (parent).
 		 * Set: The personal adjustable panning unaffected by anything.
 		 *
 		 * ISoundControl
 		 */
+=======
+		// ISoundControl
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function get pan():Number {	return _pan; }
 		public function set pan(value:Number):void
 		{
@@ -273,9 +364,24 @@
 			}
 		}
 		
+<<<<<<< HEAD
 		/** The animation pegged to playback. (ISoundControl) */
 		public function get tween():ITween {	return _tween; }
 		public function set tween(value:ITween):void
+=======
+		/**
+		 * A tween that is tied into the controls. It might not be very accurate, if the sound
+		 * is an external non-looping track.
+		 * Use this as you would filters = []. (eg. reassign the whole TimelineMax back)
+		 *
+		 * NOTE: If you need to pause the tween at the specific instance, please do. The Tween
+		 * will resume() instantly after you give it to SoundClip.
+		 *
+		 * ISoundControl
+		 */
+		public function get tween():TimelineMax {	return _tween; }
+		public function set tween(value:TimelineMax):void
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		{
 			_tween = value;
 			if (isPaused())
@@ -287,17 +393,24 @@
 		/**
 		 * Returns the sound properties of the sound. Eg. Full Repeat times, offset, truncate.
 		 *
+<<<<<<< HEAD
 		 * NOTE: You're given a cloned copy. Remember to call dispose() to facilitate GC disposal.
 		 *
 		 * ISoundClip
+=======
+		 * NOTE: This is a cloned copy. Remember to call dispose() to facilitate GC disposal.
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		 */
 		public function get soundProperties():SoundProperties	{	return sndProperties.clone();	}
 		
 		/**
 		 * How many more times the SoundClip has to repeat itself. A value of -1 means that this
 		 * is not going to repeat anymore.
+<<<<<<< HEAD
 		 *
 		 * ISoundClip
+=======
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		 */
 		public function get repeat():int	{	return _repeat;	}
 		public function set repeat(value:int):void

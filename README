@@ -1,3 +1,21 @@
+SeiON is an Actionscript 3 Sound Library. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex. By instantiating Sound objects through SeiON, you can have a layered approach to handling your sound playback. SeiON also incorporates an sound allocation system so that you don't have to keep track of every single sound instance, and will automatically dispose of them once they finish playback. By properly categorising sounds, SeiON will be able to recycle sounds and ensure that you'll always be able to keep playing more sounds without hitting the SoundChannel limit for the Flash Player.
+
+In short, SeiON does the following:
+
+* Provides a global sound manager for allocating sound instances in the Flash environment
+* Allows for pause/resume playback for sounds.
+* Provides an interface for playback of gapless MP3 loops.
+* Keeps track of and auto-disposes finished/unwanted sound instances.
+* Recycles sounds for continual creation of more sounds.
+
+Visit the wiki for more details: https://github.com/cardin/SeiON/wiki/
+
+--- THE ANIMATION LIBRARY
+SeiON comes with GreenSock's Tweening Library, which can be used to chain animation events to SeiON internally. Usage of GreenSock is opt-in by initialising the engine at the start of the program.
+
+GreenSock's Tweening Library comes under its own license, and is free for non-commercial usage. You can visit http://www.greensock.com/licensing/ to learn more about it.
+
+------------------------------------------
 Licensed under the MIT License
 
 Copyright (C) 2011 by Cardin Lee

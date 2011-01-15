@@ -39,6 +39,7 @@ package com.SeiON
 		private var samplesPosition:int = 0;
 		
 		public function SoundMP3Loop(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
+<<<<<<< HEAD
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
 			super(manager, snd, sndProperties, autodispose, spareAllocation, secretKey);
@@ -46,6 +47,17 @@ package com.SeiON
 		}
 		
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
+=======
+								autodispose:Boolean = true)
+		{
+			super(manager, snd, sndProperties, autodispose);
+			samplesTotal = sndProperties.samples; // make local, for faster access
+		}
+		
+		/**
+		 * Disposes.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		override public function dispose():void
 		{
 			super.dispose();
@@ -64,6 +76,7 @@ package com.SeiON
 		}
 		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
+<<<<<<< HEAD
 		
 		/** Plays the sound from the beginning again. (ISoundClip) */
 		override public function play():void
@@ -74,6 +87,17 @@ package com.SeiON
 			 * 	2. See @@ markers
 			 */
 			
+=======
+		/**
+		 * Plays the sound from the beginning again.
+		 *
+		 * Adapted from SoundClip.play(), changelog:
+		 *  1. Changed "starting up the sound" to reflect "out" variable
+		 * 	2. See @@ markers
+		 */
+		override public function play():void
+		{
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			stop(); // for safety's sake
 			
 			// starting up the sound
@@ -94,7 +118,13 @@ package com.SeiON
 				pause();
 		}
 		
+<<<<<<< HEAD
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
+=======
+		/**
+		 * Stops the sound and resets it to Zero.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		override public function stop():void
 		{
 			super.stop();
@@ -103,6 +133,7 @@ package com.SeiON
 			out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
 		}
 		
+<<<<<<< HEAD
 		/** Resumes playback of sound. (ISoundControl) */
 		override public function resume():void
 		{
@@ -113,6 +144,18 @@ package com.SeiON
 			 *
 			 * ----- Code is adapated from play()
 			 */
+=======
+		/**
+		 * ISoundControl
+		 *
+		 * Adapted from SoundClip.resume(), changelog:
+		 *  1. Changed "starting up the sound" to reflect "out" variable
+		 *  2. See @@
+		 */
+		override public function resume():void
+		{
+			// ----- Code is adapated from play()
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			
 			// if manager is paused, no resuming allowed!
 			if (manager.isPaused())	return;
@@ -135,6 +178,7 @@ package com.SeiON
 			}
 		}
 		
+<<<<<<< HEAD
 		/** Pauses playback of sound. (ISoundControl) */
 		override public function pause():void
 		{
@@ -144,6 +188,18 @@ package com.SeiON
 			 *  2. Removed soundChannel's unnecessary EventListener
 			 *  3. Removed truncation stuff
 			 */
+=======
+		/**
+		 * ISoundControl
+		 *
+		 * Adapted from SoundClip.pause(), changelog:
+		 *  1. Removed pausedLocation stuff
+		 *  2. Removed soundChannel's unnecessary EventListener
+		 *  3. Removed truncation stuff
+		 */
+		override public function pause():void
+		{
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			if (isPlaying())
 			{
 				soundChannel.stop();
@@ -209,6 +265,7 @@ package com.SeiON
 		/**
 		 * To be called whenever we play finish one loop
 		 * @param	e	Useless
+<<<<<<< HEAD
 		 */
 		override protected function onSoundComplete(e:Event = null):void
 		{
@@ -220,6 +277,18 @@ package com.SeiON
 			 *
 			 * After all, we only interfere if we want to end the loop. Else continue.
 			 */
+=======
+		 *
+		 * NOTE: This is adapted from super.onSoundComplete(), with the following changes:
+		 * 	1. Removed infinite loop condition.
+		 *  2. play() & associated code removed.
+		 *  3. Added _tween handling, since play() no longer does it for us.
+		 *
+		 * After all, we only interfere if we want to end the loop. Else continue.
+		 */
+		override protected function onSoundComplete(e:Event = null):void
+		{
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			if (repeat > 0) // repeating
 			{
 				-- repeat;

@@ -15,12 +15,17 @@
 	 */
 	public final class SoundProperties
 	{
+<<<<<<< HEAD
 		private var _name:String, _type:E_SoundTypes;
+=======
+		private var _name:String;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		private var _repeat:int, _samples:uint;
 		private var _offset:uint, _truncate:uint;
 		private var _soundTransform:SoundTransform;
 		
 		/**
+<<<<<<< HEAD
 		 * Please do not call this constructor directly. Use one of the SoundProperties.makeXXXX()
 		 * static methods instead.
 		 */
@@ -30,6 +35,14 @@
 		{
 			_name = name;
 			_type = type;
+=======
+		 * Please do not call this constructor directly.
+		 */
+		public function SoundProperties(name:String, soundTransform:SoundTransform = null,
+						repeat:int = -1, samples:uint = 0, offset:uint = 0, truncate:uint = 0)
+		{
+			_name = name;
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			_repeat = repeat;
 			_samples = samples;
 			_offset = offset;
@@ -38,25 +51,42 @@
 		}
 		
 		/**
+<<<<<<< HEAD
 		 * Clones another SoundProperties to use. Might be especially pertinent to ISoundClip, as
+=======
+		 * Clones another SoundProperties to use. Might be especially pertinent to SoundClip, as
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		 * it disposes the SoundProperties that is passed in.
 		 *
 		 * @return	A deep copy of all members of SoundProperties.
 		 */
 		public function clone():SoundProperties
 		{
+<<<<<<< HEAD
 			return new SoundProperties(_name, _type, new SoundTransform(_soundTransform.volume,
 								_soundTransform.volume), _repeat, _samples, _offset, _truncate);
 		}
 		
 		/** Clears all references held. This object is now invalid. */
+=======
+			return new SoundProperties(_name, new SoundTransform(_soundTransform.volume,
+								_soundTransform.volume), _repeat, _samples, _offset, _truncate);
+		}
+		
+		/**
+		 * Disposes.
+		 */
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		public function dispose():void
 		{
 			_soundTransform = null;
 		}
 		
+<<<<<<< HEAD
 		// ---------------------------------- CREATION METHODS ------------------------------
 		
+=======
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		/**
 		 * Creates properties for a looping sound. Looping sounds only has repeat, no offset or
 		 * truncation. This should NEVER be an MP3 file.
@@ -66,8 +96,12 @@
 		public static function makeLoop(name:String, repeat:int = 0,
 											soundTransform:SoundTransform = null):SoundProperties
 		{
+<<<<<<< HEAD
 			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.LOOP, soundTransform,
 															repeat);
+=======
+			var sp:SoundProperties = new SoundProperties(name, soundTransform, repeat);
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			return sp;
 		}
 		
@@ -82,8 +116,12 @@
 		public static function makeMP3Loop(name:String, samples:uint, repeat:int = 0,
 											soundTransform:SoundTransform = null):SoundProperties
 		{
+<<<<<<< HEAD
 			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.MP3_LOOP,
 														soundTransform, repeat, samples);
+=======
+			var sp:SoundProperties = new SoundProperties(name, soundTransform, repeat, samples);
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 			return sp;
 		}
 		
@@ -97,6 +135,7 @@
 		public static function makeClip(name:String, offset:uint = 0, truncate:uint = 0,
 										soundTransform:SoundTransform = null):SoundProperties
 		{
+<<<<<<< HEAD
 			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.NON_LOOP,
 														soundTransform, -1, 0, offset, truncate);
 			return sp;
@@ -110,6 +149,16 @@
 		/** The type of sound it is. */
 		public function get type():E_SoundTypes	{	return _type;	}
 		
+=======
+			var sp:SoundProperties = new SoundProperties(name, soundTransform, -1, 0, offset,
+														truncate);
+			return sp;
+		}
+		
+		/** Name of the sound, for trivial identification purposes only. */
+		public function get name():String	{	return _name;	}
+		
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 		/** The number of times this sound should repeat itself. */
 		public function get repeat():int	{	return _repeat;	}
 		
@@ -124,5 +173,21 @@
 		
 		/** The additional 'natural' panning/volume of the sound. */
 		public function get sndTransform():SoundTransform	{	return _soundTransform;	}
+<<<<<<< HEAD
+=======
+		
+		/**
+		 * Returns most appropriate description of this SoundProperty.
+		 */
+		public function get soundType():E_SoundTypes
+		{
+			if (repeat == -1)
+				return E_SoundTypes.NON_LOOP;
+			else if (samples != 0)
+				return E_SoundTypes.MP3_LOOP;
+			else
+				return E_SoundTypes.LOOP;
+		}
+>>>>>>> parent of 1ae3953... Removed duplicate folders
 	}
 }
