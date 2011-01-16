@@ -10,6 +10,7 @@
 	
 	import com.SeiON.Misc.CountDown;
 	import com.SeiON.Tween.ITween;
+	import com.SeiON.Tween.E_TweenTypes;
 	
 	/**
 	 * Our Audio Library's fundamental concept of a playable sound object. Contains internal
@@ -19,6 +20,7 @@
 	 */
 	public class SoundClip implements ISoundControl
 	{
+		/** Fired by dispatcher when SoundClip restarts() */
 		public static const SOUND_REPEAT:String = "Event.SOUND_REPEAT";
 		
 		/** -- Sound Assets --
@@ -29,6 +31,8 @@
 		 * _pan: Values between -1.0 - 0.0, they represent the adjustable panning of the sound
 		 *
 		 * _dispatcher: The place to listen for events from SoundClip.
+		 * onRepeatPhase: Tracker that signifies whether SoundClip is processing a repeat, or
+		 * 					playing anew.
 		 * _repeat: How many more times the sound has to repeat itself.
 		 * pausedLocation: Where the sound was paused, so you can pause()/resume()
 		 * _tween: For animation of sound properties
@@ -42,6 +46,7 @@
 		
 		private var _dispatcher:EventDispatcher;
 		private var _repeat:int;
+		protected var onRepeatPhase:Boolean = false;
 		private var pausedLocation:Number = -1;
 		protected var _tween:ITween;
 		private var truncation:CountDown;
@@ -85,6 +90,10 @@
 			
 			_tween = new SoundMaster.tweenCls() as ITween;
 			_tween.play();
+			if (sndProperties.repeat == -1)
+				_tween.type = E_TweenTypes.LINEAR;
+			else
+				_tween.type = E_TweenTypes.CYCLIC;
 			
 			if (autodispose) //autodispose sounds will autoplay
 				play();
@@ -99,7 +108,7 @@
 			_tween.dispose();
 			_tween = null;
 			
-			// truncation.stop() alrdy done in super().dispose's stop() above
+			// truncation.stop() alrdy done in dispose's stop() above
 			truncation = null;
 			
 			sound = null;
@@ -114,22 +123,45 @@
 		/** Plays the sound from the beginning again. (ISoundClip) */
 		public function play():void
 		{
-			stop(); // for safety's sake
-			// starting up the sound
-			soundChannel = sound.play(sndProperties.offset, 0);
-			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+			/* We have separate actions for when onRepeatPhase == true. When true, it means
+			 * play() is instead meant to be onRepeatPlay(), so we need to undo the things that
+			 * were careless discarded in stop().
+			 *
+			 * Things to watch for:
+			 * - Repeat times
+			 * - Tween repeats
+			 */
+			// Storing the variables in case of onRepeatPhase
+			var tmpRepeat:int = _repeat;
+			var tmpTweenPos:int = _tween.position;
 			
-			// setting volume and panning - triggering properties to set for us
-			volume = _volume;
-			pan = _pan;
+				stop(); // for safety's sake
+				// starting up the sound
+				soundChannel = sound.play(sndProperties.offset, 0);
+				soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				
+				// setting volume and panning - triggering properties to set for us
+				volume = _volume;
+				pan = _pan;
+				
+				// setting up truncation
+				truncation = new CountDown(this.length);
+				truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
+				
+				// (re)start tween animation
+				_tween.play();
 			
-			// setting up truncation
-			var playtime:Number = sound.length - sndProperties.offset - sndProperties.truncate;
-			truncation = new CountDown(playtime);
-			truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
-			
-			// start tween animation
-			_tween.restart();
+			// Restore the variables that had been erased
+			if (onRepeatPhase)
+			{
+				_repeat = tmpRepeat;
+				if (_tween.type == E_TweenTypes.LINEAR)		_tween.position = tmpTweenPos;
+				
+				/* If LINEAR && repeating => resume _tween.position
+				 * If LINEAR && !repeating => let _tween.position restart
+				 * If CYCLIC => It will always restart whatever whenever */
+			}
+			onRepeatPhase = false;
 			
 			// We won't play if our Manager is paused
 			if (_manager.isPaused())
@@ -148,7 +180,7 @@
 					soundChannel = null;
 				}
 				// reset variables
-				if (truncation) // 'cos we call stop() before play(), so possibly truncation == null @ this point
+				if (truncation) // 'cos play() calls stop() before truncation is even created
 				{
 					truncation.stop();
 					truncation.removeEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
@@ -277,11 +309,23 @@
 			}
 		}
 		
-		/** The animation pegged to playback. (ISoundControl) */
+		/**
+		 * The animation pegged to playback. (ISoundControl)
+		 *
+		 * If ITween.type == LINEAR, ITween will not repeat when ISoundClip repeats. It will only
+		 * restart whenever ISoundClip itself restarts (that is, stop() then play()).
+		 *
+		 * If ITween.type == CYCLIC, ITween.position will automatically jump to match that of
+		 * ISoundClip. ITween will also repeat itself whenever ISoundClip repeats.
+		 */
 		public function get tween():ITween {	return _tween; }
 		public function set tween(value:ITween):void
 		{
 			_tween = value;
+			
+			if (_tween.type == E_TweenTypes.CYCLIC)
+				_tween.position = this.position;
+			
 			if (isPaused())
 				_tween.pause();
 			else
@@ -312,16 +356,16 @@
 			_repeat = value;
 		}
 		
-		/** Read-only. The total length of the clip. In Milliseconds. (ISoundClip) */
+		/** Read-only. The total length of the clip, excluding repeats. In Milliseconds. (ISoundClip) */
 		public function get length():Number
 		{
 			return sound.length - sndProperties.offset - sndProperties.truncate;
 		}
 		
-		/** Read-only. The amount of time remaining in this cycle. In Milliseconds. (ISoundClip) */
-		public function get remainingTime():Number
+		/** Read-only. How far into the clip we are. In Milliseconds. (ISoundClip) */
+		public function get position():Number
 		{
-			return sound.length - sndProperties.truncate - soundChannel.position;
+			return soundChannel.position - sndProperties.offset;
 		}
 		
 		// -------------------------------- PRIVATE HELPER METHODS --------------------------
@@ -337,15 +381,13 @@
 			
 			if (repeat > 0) // repeating
 			{
-				var tempRepeatTrack:int = -- repeat;
-				if (tempRepeatTrack == 0)	tempRepeatTrack = -1; // the last time
+				onRepeatPhase = true;
 				
-				play();
-				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
-				repeat = tempRepeatTrack; // 'cos play() resets the repeat variable
-			}
-			else if (repeat == 0) // infinite loop
-			{
+				if (repeat == 0) // infinite loop
+				{}
+				else if (--repeat == 0) // the last time
+					repeat = -1;
+				
 				play();
 				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
 			}

@@ -46,10 +46,10 @@ package com.SeiON
 		public function get repeat():int;
 		public function set repeat(value:int):void;
 		
-		/** Read-only. The total length of the clip. In Milliseconds. (ISoundClip) */
+		/** Read-only. The total length of the clip, excluding repeats. In Milliseconds. (ISoundClip) */
 		public function get length():Number;
 		
-		/** Read-only. The amount of time remaining in this cycle. In Milliseconds. (ISoundClip) */
-		public function get remainingTime:Number;
+		/** Read-only. How far into the clip we are. In Milliseconds. (ISoundClip) */
+		public function get position:Number;
 	}
 }

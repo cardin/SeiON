@@ -5,6 +5,8 @@ package com.SeiON
 	import flash.media.Sound;
 	import flash.utils.ByteArray;
 	
+	import com.SeiON.Tween.E_TweenTypes;
+	
 	/**
 	 * Playback MP3-Loop (gapless)
 	 *
@@ -61,7 +63,7 @@ package com.SeiON
 			return sound.length * percentIsSilence;
 		}
 		
-		/** Read-only. The total length of the clip. In Milliseconds. (ISoundClip) */
+		/** Read-only. The total length of the clip, excluding repeats. In Milliseconds. (ISoundClip) */
 		override public function get length():Number
 		{
 			// calculate % of actual Sample against padded Samples
@@ -69,10 +71,10 @@ package com.SeiON
 			return samplesTotal / fatTotal * sound.length;
 		}
 		
-		/** Read-only. The amount of time remaining in this cycle. In Milliseconds. (ISoundClip) */
-		override public function get remainingTime():Number
+		/** Read-only. How far into the clip we are. In Milliseconds. (ISoundClip) */
+		override public function get position():Number
 		{
-			return length * (1 - samplesPosition / samplesTotal);
+			return samplesPosition / samplesTotal * length;
 		}
 		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
@@ -82,8 +84,10 @@ package com.SeiON
 		{
 			/*
 			 * Adapted from SoundClip.play(), changelog:
-			 *  1. Changed "starting up the sound" to reflect "out" variable
-			 * 	2. See @@ markers
+			 *  1. Removed onRepeatPhase conditions. SoundMP3Loop repeats internally in
+			 * 		sampleData(), so no tweaking of play() is necessary for repeat conditions.
+			 *  2. Changed "starting up the sound" to reflect "out" variable
+			 * 	3. See @@ markers
 			 */
 			
 			stop(); // for safety's sake
@@ -98,8 +102,8 @@ package com.SeiON
 			
 			// @@ Removed truncation code
 			
-			// start tween animation
-			_tween.restart();
+			// (re)start tween animation
+			_tween.play();
 			
 			// We won't play if our manager is paused
 			if (manager.isPaused())
@@ -226,9 +230,8 @@ package com.SeiON
 		{
 			/*
 			 * NOTE: This is adapted from super.onSoundComplete(), with the following changes:
-			 * 	1. Removed infinite loop condition.
-			 *  2. play() & associated code removed.
-			 *  3. Added _tween handling, since play() no longer does it for us.
+			 * 	1. play() & associated code removed.
+			 *  2. Added _tween handling, since play() no longer does it for us.
 			 *
 			 * After all, we only interfere if we want to end the loop. Else continue.
 			 */
@@ -236,21 +239,15 @@ package com.SeiON
 			
 			if (repeat > 0) // repeating
 			{
-				var tempRepeatTrack:int = -- repeat;
-				if (tempRepeatTrack == 0)	tempRepeatTrack = -1; // the last time
+				if (repeat == 0) // infinite loop
+				{}
+				else if (--repeat == 0) // the last time
+					repeat = -1;
 				
 				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
-				repeat = tempRepeatTrack; // 'cos play() resets the repeat variable
 				
-				// Resynchronise _tween again, since we don't know the exact length of this sound
-				_tween.restart();
-			}
-			else if (repeat == 0) // infinite loop
-			{
-				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
-				
-				// Resynchronise _tween again, since we don't know the exact length of this sound
-				_tween.restart();
+				if (_tween.type == E_TweenTypes.CYCLIC) // repeat the tween
+					_tween.play();
 			}
 			else // disposing
 			{

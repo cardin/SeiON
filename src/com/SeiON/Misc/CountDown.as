@@ -75,23 +75,20 @@
 		// ------------------------------------ METHODS -----------------------------------
 		
 		/**
-		 * Starts counting down. It also forces a paused timer to restart.
+		 * Starts counting down. If there was any playback originally, this will force CountDown to
+		 * restart from the beginning.
 		 */
 		override public function start():void
 		{
-			if (lastElapsedTime != 0) // != 0 means it's alrdy started
-				return;
-			
 			reset(); // force a hard reset
 			super.start();
 			
 			lastElapsedTime = getTimer();
 		}
 		
-		/**
-		 * Stops the countdown. stop() and reset() are identical.
-		 */
+		/** Stops the countdown. stop() and reset() are identical. */
 		override public function reset():void {	stop();	}
+		/** Stops the countdown. stop() and reset() are identical. */
 		override public function stop():void
 		{
 			super.stop();

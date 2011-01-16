@@ -47,7 +47,6 @@ package com.SeiON
 			// Sets up the default tweening library first
 			setTweenLib(NullTween);
 			_tween = new NullTween();
-			_tween.play();
 		}
 		
 		/**
