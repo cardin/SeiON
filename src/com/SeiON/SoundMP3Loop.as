@@ -79,7 +79,7 @@ package com.SeiON
 		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
 		
-		/** Plays the sound from the beginning again. (ISoundClip) */
+		/** Plays the sound from the beginning again according to sndProperties. (ISoundClip) */
 		override public function play():void
 		{
 			/*

@@ -9,9 +9,9 @@ package com.SeiON
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
 		public function dispose();
 		
-		/** Stops the sound and resets it to Zero. (ISoundClip) */
+		/** Plays the sound from the beginning again according to sndProperties. (ISoundClip) */
 		public function play();
-		/** Plays the sound from the beginning again. (ISoundClip) */
+		/** Stops the sound and resets it to Zero. (ISoundClip) */
 		public function stop();
 		
 		/** Is the sound active? (ISoundClip) */
