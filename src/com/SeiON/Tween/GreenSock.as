@@ -48,7 +48,7 @@ package com.SeiON.Tween
 		
 		/** Sets the tweening behaviour type to be used for ISoundClip. (ITween) */
 		public function get type():E_TweenTypes {	return _type;	}
-		public function set type(value:E_TweenTypes):void;	{	_type = value;	}
+		public function set type(value:E_TweenTypes):void	{	_type = value;	}
 		
 		/** Plays the Tween forward from the beginning. (ITween) */
 		public function play():void {	_tween.restart();	}
@@ -61,7 +61,7 @@ package com.SeiON.Tween
 		public function resume():void	{	_tween.play(); }
 		
 		/** The position it is at, not counting repeats. In Milliseconds. (ITween) */
-		function get position():Number	{	_tween.currentTime;	}
-		function set position(value:Number):void {	_tween.goto(value);	}
+		public function get position():Number	{	return _tween.currentTime;	}
+		public function set position(value:Number):void {	_tween.goto(value);	}
 	}
 }

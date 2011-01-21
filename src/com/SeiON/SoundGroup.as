@@ -43,7 +43,7 @@
 		 * This distinction is necessary because some sounds have to be manually held, eg. when
 		 * we fade bg music to open up a sub-menu. Auto-disposables are a must, so as to be
 		 * cannibalised to free up more allocation.
-		 */
+		 //*/
 		private var list:Vector.<ISoundClip> = new Vector.<ISoundClip>();
 		private var autoList:Vector.<ISoundClip> = new Vector.<ISoundClip>();
 		private var fullAllocation:uint;
@@ -224,6 +224,7 @@
 				// Cannibalise the autodispose list
 				if (autoList.length > 0)
 					autoList[0].dispose(); // dispose will autocall killSound() later
+				
 				// beg clemency from SoundMaster if it's autodisposable
 				else if (autodispose && SoundMaster.getSpareAllocation())
 				{
@@ -252,6 +253,14 @@
 			if (autodispose)
 			{
 				autoList.push(sc);
+				
+				/*
+				 * The auto-play (sc.play()) is place here because if a ISoundClip is short enough,
+				 * it will dispose exactly after its constructor is called. Which means by the time
+				 * we get here, it's already diposed!
+				 */
+				// auto-disposable auto-plays
+				sc.play();
 				return null;
 			}
 			else

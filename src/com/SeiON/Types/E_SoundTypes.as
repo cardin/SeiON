@@ -1,5 +1,8 @@
 package com.SeiON.Types
 {
+	import flash.utils.getQualifiedClassName;
+	import flash.utils.getDefinitionByName;
+	
 	import com.SeiON.SoundClip;
 	import com.SeiON.SoundMP3Loop;
 	import com.SeiON.Misc.Enumerable;
@@ -13,13 +16,14 @@ package com.SeiON.Types
 		/** An MP3 looping sound. */
 		public static const MP3_LOOP:E_SoundTypes = new E_SoundTypes();
 		
-		internal static var _cls:Class;
+		private var _cls:String;
 		
 		{
 			initEnum(E_SoundTypes);
 			
-			NON_LOOP._cls = LOOP._cls = SoundClip;
-			MP3_LOOP._cls = SoundMP3Loop;
+			NON_LOOP._cls = LOOP._cls = getQualifiedClassName(SoundClip);
+			MP3_LOOP._cls = getQualifiedClassName(SoundMP3Loop);
+			
 		}
 		
 		/**
@@ -27,7 +31,7 @@ package com.SeiON.Types
 		 */
 		public function get clsRef():Class
 		{
-			return _cls;
+			return getDefinitionByName(_cls) as Class;
 		}
 	}
 }

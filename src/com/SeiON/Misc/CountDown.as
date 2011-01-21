@@ -54,14 +54,18 @@
 		override public function set repeatCount(value:int):void {}
 		
 		/**
-		 * The countdown this Timer was set with, in Milliseconds.
+		 * The countdown this Timer was set with, in Milliseconds. Setting a negative value will
+		 * default to 0. If delay = 0, CountDown will refuse to start.
 		 *
 		 * If you set a new delay time while Timer is running or paused, the Timer will either
 		 * reset or restart itself.
+		 *
 		 */
 		override public function get delay():Number {	return originalDelay;	}
 		override public function set delay(value:Number):void
 		{
+			if (value < 0)	value = 0;
+			
 			originalDelay = value;
 			if (running)
 			{
@@ -81,8 +85,12 @@
 		override public function start():void
 		{
 			reset(); // force a hard reset
-			super.start();
 			
+			// don't bother counting if 0
+			if (originalDelay == 0)
+				return;
+			
+			super.start();
 			lastElapsedTime = getTimer();
 		}
 		

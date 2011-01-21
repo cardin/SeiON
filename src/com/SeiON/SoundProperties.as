@@ -113,10 +113,10 @@
 		/** The number of times this sound should repeat itself. */
 		public function get repeat():int	{	return _repeat;	}
 		
-		/** A fixed amount of time to advance before starting the sound. In Milliseconds. */
+		/** Time to cut off from the start of the sound. In Milliseconds. */
 		public function get offset():uint	{	return _offset;	}
 		
-		/** A fixed amount of time to end the sound prematurely. In Milliseconds. */
+		/** Time to cut off from the end of the sound. In Milliseconds. */
 		public function get truncate():uint	{	return _truncate;	}
 		
 		/** The number of samples that the sound has. */

@@ -1,4 +1,4 @@
-package com.SeiON
+﻿package com.SeiON
 {
 	import flash.events.Event;
 	import flash.events.SampleDataEvent;
@@ -40,10 +40,22 @@ package com.SeiON
 		private var samplesTotal:uint = 0;
 		private var samplesPosition:int = 0;
 		
+		/** -- Playback Variables --
+		 * _paused: The sound is paused.
+		 */
+		private var _paused:Boolean = false;
+		
+		/**
+		 * @throws UninitializedError	When sndProperties.sample is equals to 0.
+		 */
 		public function SoundMP3Loop(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
 			super(manager, snd, sndProperties, autodispose, spareAllocation, secretKey);
+			
+			if (sndProperties.samples == 0)
+				throw new UninitializedError("sndProperties.sample cannot be 0, have you initialised "
+											+ "it yet?");
 			samplesTotal = sndProperties.samples; // make local, for faster access
 		}
 		
@@ -77,6 +89,12 @@ package com.SeiON
 			return samplesPosition / samplesTotal * length;
 		}
 		
+		/** Is the playback paused? (ISoundControl) */
+		override public function isPaused():Boolean
+		{
+			return _paused;
+		}
+		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
 		
 		/** Plays the sound from the beginning again according to sndProperties. (ISoundClip) */
@@ -87,36 +105,30 @@ package com.SeiON
 			 *  1. Removed onRepeatPhase conditions. SoundMP3Loop repeats internally in
 			 * 		sampleData(), so no tweaking of play() is necessary for repeat conditions.
 			 *  2. Changed "starting up the sound" to reflect "out" variable
-			 * 	3. See @@ markers
+			 *  3. Added _paused initialisation to force isPaused() to return true.
+			 * 	4. See @@ markers
 			 */
 			
 			stop(); // for safety's sake
 			
-			// starting up the sound
-			out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
-			soundChannel = out.play();
-			
-			// setting volume and panning - triggering properties to set for us
-			volume = _volume;
-			pan = _pan;
-			
 			// @@ Removed truncation code
 			
 			// (re)start tween animation
-			_tween.play();
+			tween.stop();
 			
-			// We won't play if our manager is paused
-			if (manager.isPaused())
-				pause();
+			_paused = true;
+			resume();
 		}
 		
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
 		override public function stop():void
 		{
 			super.stop();
+			_paused = false;
 			
 			samplesPosition = 0;
-			out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
+			if (out)
+				out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
 		}
 		
 		/** Resumes playback of sound. (ISoundControl) */
@@ -124,10 +136,9 @@ package com.SeiON
 		{
 			/*
 			 * Adapted from SoundClip.resume(), changelog:
-			 *  1. Changed "starting up the sound" to reflect "out" variable
-			 *  2. See @@
-			 *
-			 * ----- Code is adapated from play()
+			 *  1. Added _paused initialisation.
+			 *  2. Changed "starting up the sound" to reflect "out" variable
+			 *  3. See @@
 			 */
 			
 			// if manager is paused, no resuming allowed!
@@ -136,9 +147,7 @@ package com.SeiON
 			// resume is only valid if it were paused in the 1st place
 			if (isPaused())
 			{
-				// starting up the sound
-				out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
-				soundChannel = out.play();
+				_paused = false;
 				
 				// setting volume and panning - triggering properties to set for us
 				volume = _volume;
@@ -147,7 +156,11 @@ package com.SeiON
 				// @@ removed truncation code
 				
 				// start tween animation
-				_tween.resume();
+				tween.resume();
+				
+				// starting up the sound
+				out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
+				soundChannel = out.play(0, 0, sndTransform);
 			}
 		}
 		
@@ -159,6 +172,7 @@ package com.SeiON
 			 *  1. Removed pausedLocation stuff
 			 *  2. Removed soundChannel's unnecessary EventListener
 			 *  3. Removed truncation stuff
+			 *  4. Added _paused initialisation.
 			 */
 			if (isPlaying())
 			{
@@ -166,7 +180,8 @@ package com.SeiON
 				soundChannel = null;
 				out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
 				
-				_tween.pause();
+				tween.pause();
+				_paused = true;
 			}
 		}
 		
@@ -244,14 +259,14 @@ package com.SeiON
 				else if (--repeat == 0) // the last time
 					repeat = -1;
 				
-				_dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
+				dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
 				
-				if (_tween.type == E_TweenTypes.CYCLIC) // repeat the tween
-					_tween.play();
+				if (tween.type == E_TweenTypes.CYCLIC) // repeat the tween
+					tween.play();
 			}
 			else // disposing
 			{
-				_dispatcher.dispatchEvent(new Event(Event.SOUND_COMPLETE));
+				dispatcher.dispatchEvent(new Event(Event.SOUND_COMPLETE));
 				stop();
 				if (autodispose)
 					dispose();

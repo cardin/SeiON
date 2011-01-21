@@ -7,26 +7,26 @@ package com.SeiON
 	public interface ISoundClip extends ISoundControl
 	{
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
-		public function dispose();
+		function dispose():void;
 		
 		/** Plays the sound from the beginning again according to sndProperties. (ISoundClip) */
-		public function play();
+		function play():void;
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
-		public function stop();
+		function stop():void;
 		
 		/** Is the sound active? (ISoundClip) */
-		public function isPlaying();
+		function isPlaying():Boolean;
 		
 		// ----------------------------------- PROPERTIES -------------------------------
 		
 		/** Read-only. Returns the manager that holds this ISoundClip. */
-		public function get manager():SoundGroup;
+		function get manager():SoundGroup;
 		
 		/** Read-only. Used by SoundManager to check if this clip was borrowed from SoundMaster. (ISoundClip) */
-		public function get spareAllocation():Boolean;
+		function get spareAllocation():Boolean;
 		
 		/** Read-only. Fires off Event.SOUND_COMPLETE and/or SoundClip.SOUND_REPEAT. (ISoundControl) */
-		public function get dispatcher():EventDispatcher;
+		function get dispatcher():EventDispatcher;
 		
 		/** Read-only
 		 * Returns the sound properties of the sound. Eg. Full Repeat times, offset, truncate.
@@ -35,7 +35,7 @@ package com.SeiON
 		 *
 		 * ISoundClip
 		 */
-		public function get soundProperties():SoundProperties;
+		function get soundProperties():SoundProperties;
 		
 		/**
 		 * How many more times the ISoundClip has to repeat itself. A value of -1 means that this
@@ -43,13 +43,13 @@ package com.SeiON
 		 *
 		 * ISoundClip
 		 */
-		public function get repeat():int;
-		public function set repeat(value:int):void;
+		function get repeat():int;
+		function set repeat(value:int):void;
 		
 		/** Read-only. The total length of the clip, excluding repeats. In Milliseconds. (ISoundClip) */
-		public function get length():Number;
+		function get length():Number;
 		
 		/** Read-only. How far into the clip we are. In Milliseconds. (ISoundClip) */
-		public function get position:Number;
+		function get position():Number;
 	}
 }

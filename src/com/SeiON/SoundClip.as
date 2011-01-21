@@ -18,7 +18,7 @@
 	 *
 	 * Can be created with a specific delay or offset.
 	 */
-	public class SoundClip implements ISoundControl
+	public class SoundClip implements ISoundClip
 	{
 		/** Fired by dispatcher when SoundClip restarts() */
 		public static const SOUND_REPEAT:String = "Event.SOUND_REPEAT";
@@ -39,13 +39,14 @@
 		protected var sound:Sound;
 		protected var soundChannel:SoundChannel;
 		private var sndProperties:SoundProperties;
+		protected var sndTransform:SoundTransform;
 		protected var _volume:Number = 1.0;
 		protected var _pan:Number = 0;
 		
 		private var _dispatcher:EventDispatcher;
 		private var _repeat:int;
 		private var pausedLocation:Number = -1;
-		protected var _tween:ITween;
+		private var _tween:ITween;
 		private var truncation:CountDown;
 		
 		/** -- Manager vars --
@@ -53,7 +54,7 @@
 		 * autodispose: If true, this SoundGroup shall be auto-disposed
 		 * spareAllocation: Used by SoundManager to check if this clip was borrowed from SoundMaster
 		 */
-		protected var _manager:SoundGroup;
+		private var _manager:SoundGroup;
 		protected var autodispose:Boolean;
 		private var _spareAllocation:Boolean;
 		
@@ -71,13 +72,15 @@
 		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
-			if (secretKey != _manager.killSound)
+			if (secretKey != manager.killSound)
 				throw new IllegalOperationError("ISoundClip's constructor not allowed for direct "
-				+ "access! Please use SoundGroup.createSound() instead."
+				+ "access! Please use SoundGroup.createSound() instead.");
 			
 			// Flash Sound characteristics
 			this.sound = snd;
 			this.sndProperties = sndProperties;
+			this.sndTransform = new SoundTransform(sndProperties.sndTransform.volume,
+													sndProperties.sndTransform.pan);
 			this._repeat = sndProperties.repeat;
 			
 			// Parent control
@@ -85,15 +88,13 @@
 			this.autodispose = autodispose;
 			this._spareAllocation = spareAllocation;
 			
+			_dispatcher = new EventDispatcher();
 			_tween = new SoundMaster.tweenCls() as ITween;
 			_tween.play();
 			if (sndProperties.repeat == -1)
 				_tween.type = E_TweenTypes.LINEAR;
 			else
 				_tween.type = E_TweenTypes.CYCLIC;
-			
-			if (autodispose) //autodispose sounds will autoplay
-				play();
 		}
 		
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
@@ -109,6 +110,7 @@
 			truncation = null;
 			
 			sound = null;
+			sndTransform = null;
 			sndProperties.dispose();
 			sndProperties = null;
 			_manager.killSound(this);
@@ -121,25 +123,20 @@
 		public function play():void
 		{
 			stop(); // for safety's sake
-			// starting up the sound
-			soundChannel = sound.play(sndProperties.offset, 0);
-			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			
-			// setting volume and panning - triggering properties to set for us
-			volume = _volume;
-			pan = _pan;
-				
 			// setting up truncation
-			truncation = new CountDown(this.length);
+			var truncateLength:Number = (sndProperties.truncate == 0) ? 0 : this.length;
+			truncation = new CountDown(truncateLength);
+			truncation.pause();
 			truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
 			
 			// (re)start tween animation
-			_tween.play();
+			_tween.stop();
 			_tween.position = sndProperties.offset;
 			
-			// We won't play if our Manager is paused
-			if (_manager.isPaused())
-				pause();
+			pausedLocation = sndProperties.offset;
+			
+			resume();
 		}
 		
 		/** Stops the sound and resets it to Zero. (ISoundClip) */
@@ -169,19 +166,12 @@
 		/** Resumes playback of sound. (ISoundControl) */
 		public function resume():void
 		{
-			// ----- Code is adapated from play()
-			
 			// if manager is paused, no resuming allowed!
 			if (_manager.isPaused())	return;
 			
 			// resume is only valid if it were paused in the 1st place
 			if (isPaused())
 			{
-				// starting up the sound
-				soundChannel = sound.play(pausedLocation, 0);
-				soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-				pausedLocation = -1;
-				
 				// setting volume and panning - triggering properties to set for us
 				volume = _volume;
 				pan = _pan;
@@ -191,6 +181,11 @@
 				
 				// start tween animation
 				_tween.resume();
+				
+				// starting up the sound
+				soundChannel = sound.play(pausedLocation, 0, sndTransform);
+				soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				pausedLocation = -1;
 			}
 		}
 		
@@ -245,14 +240,12 @@
 		public function set volume(value:Number):void
 		{
 			_volume = value;
+			
+			// final Volume = native Volume * current Volume * parent's volume
+			sndTransform.volume = sndProperties.sndTransform.volume * _volume * _manager.volume;
+			
 			if (isPlaying())
-			{
-				var st:SoundTransform = soundChannel.soundTransform;
-				
-				// final Volume = native Volume * current Volume * parent's volume
-				st.volume = sndProperties.sndTransform.volume * _volume * _manager.volume;
-				soundChannel.soundTransform = st;
-			}
+				soundChannel.soundTransform = sndTransform;
 		}
 		
 		/**
@@ -266,21 +259,17 @@
 		{
 			_pan = value;
 			
+			var desiredDir:int = (_pan > 0) ? 1 : -1;
+			var amtToMove:Number = (desiredDir - sndProperties.sndTransform.pan) * Math.abs(_pan);
+			sndTransform.pan = amtToMove + sndProperties.sndTransform.pan;
+			
+			//adding on the parent's panning
+			desiredDir = (_manager.pan > 0) ? 1 : -1;
+			amtToMove = (desiredDir - sndTransform.pan) * Math.abs(_manager.pan);
+			sndTransform.pan = amtToMove + sndTransform.pan;
+			
 			if (isPlaying())
-			{
-				var st:SoundTransform = soundChannel.soundTransform;
-				
-				var desiredDir:int = (_pan > 0) ? 1 : -1;
-				var amtToMove:Number = (desiredDir - sndProperties.sndTransform.pan) * Math.abs(_pan);
-				st.pan = amtToMove + sndProperties.sndTransform.pan;
-				
-				//adding on the parent's panning
-				desiredDir = (_manager.pan > 0) ? 1 : -1;
-				amtToMove = (desiredDir - st.pan) * Math.abs(_manager.pan);
-				st.pan = amtToMove + st.pan;
-				
-				soundChannel.soundTransform = st;
-			}
+				soundChannel.soundTransform = sndTransform;
 		}
 		
 		/**
@@ -351,7 +340,7 @@
 		 */
 		protected function onSoundComplete(e:Event = null):void
 		{
-			if (e)	e.stopImmediatePropagation();
+			if (e)		e.stopImmediatePropagation();
 			
 			if (repeat > 0) // repeating
 			{
