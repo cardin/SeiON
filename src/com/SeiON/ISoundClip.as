@@ -1,6 +1,9 @@
 package com.SeiON
 {
 	import flash.events.EventDispatcher;
+	
+	import com.SeiON.Types.SoundProperty;
+	
 	/**
 	 * Interface for sound objects that will be handling playback of the actual Sound object.
 	 */
@@ -19,10 +22,16 @@ package com.SeiON
 		
 		// ----------------------------------- PROPERTIES -------------------------------
 		
+		/** Read-only. The fully qualified name of the sound class that was playing. */
+		function get soundCls():String;
+		
 		/** Read-only. Returns the manager that holds this ISoundClip. */
 		function get manager():SoundGroup;
 		
-		/** Read-only. Used by SoundManager to check if this clip was borrowed from SoundMaster. (ISoundClip) */
+		/** Read-only. Whether this sound is auto-disposable. */
+		function get autodispose():Boolean;
+		
+		/** Read-only. Used by SoundManager to check if this clip was a borrowed spare. (ISoundClip) */
 		function get spareAllocation():Boolean;
 		
 		/** Read-only. Fires off Event.SOUND_COMPLETE and/or SoundClip.SOUND_REPEAT. (ISoundControl) */
@@ -35,7 +44,7 @@ package com.SeiON
 		 *
 		 * ISoundClip
 		 */
-		function get soundProperties():SoundProperties;
+		function get soundproperty():SoundProperty;
 		
 		/**
 		 * How many more times the ISoundClip has to repeat itself. A value of -1 means that this

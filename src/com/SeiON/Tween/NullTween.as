@@ -7,8 +7,8 @@ package com.SeiON.Tween
 	{
 		public function dispose():void {}
 		
-		public function get type():E_TweenTypes { return null; }
-		public function set type(value:E_TweenTypes):void {}
+		public function get type():TweenTypes { return null; }
+		public function set type(value:TweenTypes):void {}
 		
 		public function play():void {}
 		public function stop():void {}

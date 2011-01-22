@@ -6,8 +6,9 @@
 	import flash.media.SoundTransform;
 	
 	import com.SeiON.ISoundClip;
-	import com.SeiON.Types.E_SoundTypes;
+	import com.SeiON.Types.SoundTypes;
 	import com.SeiON.Tween.ITween;
+	import com.SeiON.Types.SoundProperty;
 	
 	/**
 	 * In charge of near-global rationing of SoundClips, as well as their playback and properties.
@@ -20,6 +21,9 @@
 	 */
 	public final class SoundGroup implements ISoundControl
 	{
+		/** Name of the SoundGroup. */
+		public var name:String;
+		
 		/** -- Misc --
 		 * _pause: Whether the sound object is paused or not.
 		 * _volume: The adjustable volume of the SoundGroup
@@ -61,12 +65,13 @@
 		 *
 		 * @see SoundMaster.createSoundGroup()
 		 */
-		public function SoundGroup(allocatedAmt:uint, secretKey:*)
+		public function SoundGroup(name:String, allocatedAmt:uint, secretKey:*)
 		{
 			if (secretKey != SoundMaster.killSoundGroup)
 				throw new IllegalOperationError("SoundGroup's constructor not allowed for direct "
 				+ "access! Please use SoundMaster.createSoundGroup() to instantiate SoundGroups!");
 			
+			this.name = name;
 			this.fullAllocation = this.allocatedAmt = allocatedAmt;
 			
 			_tween = new SoundMaster.tweenCls() as ITween;
@@ -214,7 +219,7 @@
 		 * 2. You created an autodispose sound.
 		 * Else, it will return a handle to the ISoundClip you created.
 		 */
-		public function createSound(snd:Sound, sndProperties:SoundProperties,
+		public function createSound(snd:Sound, sndProperties:SoundProperty,
 								autodispose:Boolean = true):ISoundClip
 		{
 			var isSpareAllocated:Boolean = false;
@@ -268,6 +273,46 @@
 				list.push(sc);
 				return sc;
 			}
+		}
+		
+		/**
+		 * Returns an array of all ISoundClips' details.
+		 * name:		name of the sound class
+		 * ad:			Auto diposable?
+		 * playing:		Does it hold a sound channel
+		 * propname:	Name of the SoundProperty.
+		 */
+		internal function stats():Array
+		{
+			/* This function is here and not in ISoundClip is because:
+			 * 1. ISoundClip would've made it public access
+			 * 2. SoundGroup would still need to be the one polling, since only
+			 *    SoundGroup knows what it holds. (autoList/list is private)
+			 */
+			var arr:Array = new Array();
+			
+			var sc:ISoundClip, stat:Object;
+			for each (sc in list)
+			{
+				stat = new Object();
+				stat.name = sc.soundCls;
+				stat.ad = sc.autodispose;
+				stat.playing = sc.isPlaying;
+				stat.propname = sc.soundproperty.name;
+				
+				arr.push(stat);
+			}
+			for each (sc in autoList)
+			{
+				stat = new Object();
+				stat.name = sc.soundCls;
+				stat.ad = sc.autodispose;
+				stat.playing = sc.isPlaying;
+				stat.propname = sc.soundproperty.name;
+				
+				arr.push(stat);
+			}
+			return arr;
 		}
 	}
 }

@@ -7,19 +7,19 @@ package com.SeiON.Types
 	import com.SeiON.SoundMP3Loop;
 	import com.SeiON.Misc.Enumerable;
 	
-	public class E_SoundTypes extends Enumerable
+	public final class SoundTypes extends Enumerable
 	{
 		/** A normal non-looping sound. */
-		public static const NON_LOOP:E_SoundTypes = new E_SoundTypes();
+		public static const NON_LOOP:SoundTypes = new SoundTypes();
 		/** A non-MP3 looping sound. */
-		public static const LOOP:E_SoundTypes = new E_SoundTypes();
+		public static const LOOP:SoundTypes = new SoundTypes();
 		/** An MP3 looping sound. */
-		public static const MP3_LOOP:E_SoundTypes = new E_SoundTypes();
+		public static const MP3_LOOP:SoundTypes = new SoundTypes();
 		
 		private var _cls:String;
 		
 		{
-			initEnum(E_SoundTypes);
+			initEnum(SoundTypes);
 			
 			NON_LOOP._cls = LOOP._cls = getQualifiedClassName(SoundClip);
 			MP3_LOOP._cls = getQualifiedClassName(SoundMP3Loop);

@@ -5,7 +5,8 @@
 	import flash.media.Sound;
 	import flash.utils.ByteArray;
 	
-	import com.SeiON.Tween.E_TweenTypes;
+	import com.SeiON.Tween.TweenTypes;
+	import com.SeiON.Types.SoundProperty;
 	
 	/**
 	 * Playback MP3-Loop (gapless)
@@ -33,7 +34,7 @@
 		
 		/** -- Sampling Variables --
 		 * out: Use for output stream
-		 * samplesTotal: Same as SoundProperties.samples. Local variable for faster access.
+		 * samplesTotal: Same as SoundProperty.samples. Local variable for faster access.
 		 * samplePosition: The read-head position.
 		 */
 		private var out:Sound = new Sound(); // Use for output stream
@@ -48,7 +49,7 @@
 		/**
 		 * @throws UninitializedError	When sndProperties.sample is equals to 0.
 		 */
-		public function SoundMP3Loop(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
+		public function SoundMP3Loop(manager:SoundGroup, snd:Sound, sndProperties:SoundProperty,
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
 			super(manager, snd, sndProperties, autodispose, spareAllocation, secretKey);
@@ -261,7 +262,7 @@
 				
 				dispatcher.dispatchEvent(new Event(SOUND_REPEAT));
 				
-				if (tween.type == E_TweenTypes.CYCLIC) // repeat the tween
+				if (tween.type == TweenTypes.CYCLIC) // repeat the tween
 					tween.play();
 			}
 			else // disposing

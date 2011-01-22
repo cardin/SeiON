@@ -5,16 +5,16 @@ package com.SeiON.Tween
 	/**
 	 * The kind of tweening behaviour that ITween will follow. This choice applies only to ISoundClips.
 	 */
-	public class E_TweenTypes extends Enumerable
+	public final class TweenTypes extends Enumerable
 	{
 		/** Repeats itself as ISoundClip repeats itself. */
-		public static const CYCLIC:E_TweenTypes = new E_TweenTypes();
+		public static const CYCLIC:TweenTypes = new TweenTypes();
 		/** It will only repeat if ISoundClip 'restarts', otherwise it will continue playing through
 		 * all of ISoundClip's loops unaffected. */
-		public static const LINEAR:E_TweenTypes = new E_TweenTypes();
+		public static const LINEAR:TweenTypes = new TweenTypes();
 		
 		{
-			initEnum(E_TweenTypes);
+			initEnum(TweenTypes);
 		}
 		
 	}

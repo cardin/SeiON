@@ -10,8 +10,8 @@ package com.SeiON.Tween
 		function dispose():void;
 		
 		/** Sets the tweening behaviour type to be used for ISoundClip. (ITween) */
-		function get type():E_TweenTypes;
-		function set type(value:E_TweenTypes):void;
+		function get type():TweenTypes;
+		function set type(value:TweenTypes):void;
 		
 		/** Plays the Tween forward from the beginning. (ITween) */
 		function play():void;

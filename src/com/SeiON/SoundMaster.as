@@ -49,6 +49,8 @@ package com.SeiON
 			_tween = new NullTween();
 		}
 		
+		// ---------------------------- GLOBAL SOUND FUNCTIONS -----------------------------
+		
 		/**
 		 * Sets the tweening library that we will use for the sound system. For best effect, call
 		 * this function as early as possible before any sound objects are created.
@@ -73,6 +75,39 @@ package com.SeiON
 					return;
 				}
 			}
+		}
+		
+		/** Gives a formatted text string showing the internal progress of SeiON. */
+		public static function statReport():String
+		{
+			var arr:Array;
+			var output:String = "";
+			var spareAlloc:uint = fullAllocation;
+			
+			for each (var sg:SoundGroup in soundGroup)
+			{
+				arr = sg.stats();
+				
+				// <name> <avail/allocation> <isPlaying>
+				output += sg.name + " (" + sg.availAllocation + " / " + sg.completeAllocation + ")";
+				output += (sg.isPaused() ? "\n" : " (p)\n");
+				
+				// for each ISoundClip in SoundGroup
+				for each (var obj:Object in arr)
+				{
+					output += "     ";
+					// <name> <autoDisposable> <isPlaying> <property name>
+					output += obj.name + " ";
+					output += (obj.ad ? "(ad)" : "   ");
+					output += (obj.playing ? "(p)" : "   ");
+					output += " " + obj.propname + "\n";
+				}
+				spareAlloc -= sg.completeAllocation;
+			}
+			
+			output += "Spare (" + spareAlloc + ")";
+			output = "-------------------/n" + output + "/n-------------------";
+			return output;
 		}
 		
 		// ------------------------------- PLAYBACK CONTROLS ---------------------------
@@ -130,9 +165,11 @@ package com.SeiON
 		/**
 		 * Allocates for a SoundGroup and keeps track of it internally.
 		 *
+		 * @param	name			Name of the SoundGroup. Doesn't have to be unique; for your
+		 * own convenience only.
 		 * @param	allocatedAmt	The number sound instances the SoundGroup is permitted. If
-		 * 							there isn't enough allocation available in SoundMaster, we
-		 * 							will not create any SoundGroup at all.
+		 * there isn't enough allocation available in SoundMaster, we will not create any
+		 * SoundGroup at all.
 		 *
 		 * @return	Returns null if we do not have that many allocations.
 		 *
@@ -140,7 +177,7 @@ package com.SeiON
 		 * 		SoundGroups are meant to be permanent long-term objects. We will not settle for
 		 * 		less when creating such a long-term object.
 		 */
-		public static function createSoundGroup(allocatedAmt:uint):SoundGroup
+		public static function createSoundGroup(name:String, allocatedAmt:uint):SoundGroup
 		{
 			// ensure we have enough sound instances to give out
 			if (allocation >= allocatedAmt)
@@ -149,7 +186,7 @@ package com.SeiON
 				return null;
 			
 			// aligning SoundGroup to our orientations
-			var sg:SoundGroup = new SoundGroup(allocatedAmt, killSoundGroup);
+			var sg:SoundGroup = new SoundGroup(name, allocatedAmt, killSoundGroup);
 			if (_this.isPaused())
 				sg.pause();
 			sg.volume = 1;

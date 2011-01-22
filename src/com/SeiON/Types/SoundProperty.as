@@ -1,8 +1,6 @@
-﻿package com.SeiON
+﻿package com.SeiON.Types
 {
 	import flash.media.SoundTransform;
-	
-	import com.SeiON.Types.E_SoundTypes;
 	
 	/**
 	 * Defines the properties of a particular sound instance.
@@ -13,22 +11,24 @@
 	 * Imagine this to be the MP3 id tags that defines the sound, without incurring the memory
 	 * overhead of actually having a Sound instance (because we use Class object).
 	 */
-	public final class SoundProperties
+	public final class SoundProperty
 	{
-		private var _name:String, _type:E_SoundTypes;
+		/** Name of this property. */
+		public var name:String;
+		private var _type:SoundTypes;
 		private var _repeat:int, _samples:uint;
 		private var _offset:uint, _truncate:uint;
 		private var _soundTransform:SoundTransform;
 		
 		/**
-		 * Please do not call this constructor directly. Use one of the SoundProperties.makeXXXX()
+		 * Please do not call this constructor directly. Use one of the SoundProperty.makeXXXX()
 		 * static methods instead.
 		 */
-		public function SoundProperties(name:String, type:E_SoundTypes,
+		public function SoundProperty(name:String, type:SoundTypes,
 						soundTransform:SoundTransform = null, repeat:int = -1, samples:uint = 0,
 						offset:uint = 0, truncate:uint = 0)
 		{
-			_name = name;
+			this.name = name;
 			_type = type;
 			_repeat = repeat;
 			_samples = samples;
@@ -38,14 +38,14 @@
 		}
 		
 		/**
-		 * Clones another SoundProperties to use. Might be especially pertinent to ISoundClip, as
-		 * it disposes the SoundProperties that is passed in.
+		 * Clones another SoundProperty to use. Might be especially pertinent to ISoundClip, as
+		 * it disposes the SoundProperty that is passed in.
 		 *
-		 * @return	A deep copy of all members of SoundProperties.
+		 * @return	A deep copy of all members of SoundProperty.
 		 */
-		public function clone():SoundProperties
+		public function clone():SoundProperty
 		{
-			return new SoundProperties(_name, _type, new SoundTransform(_soundTransform.volume,
+			return new SoundProperty(name, _type, new SoundTransform(_soundTransform.volume,
 								_soundTransform.volume), _repeat, _samples, _offset, _truncate);
 		}
 		
@@ -64,9 +64,9 @@
 		 * @param	repeat		Put 0 to get infinite loop
 		 */
 		public static function makeLoop(name:String, repeat:int = 0,
-											soundTransform:SoundTransform = null):SoundProperties
+											soundTransform:SoundTransform = null):SoundProperty
 		{
-			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.LOOP, soundTransform,
+			var sp:SoundProperty = new SoundProperty(name, SoundTypes.LOOP, soundTransform,
 															repeat);
 			return sp;
 		}
@@ -80,9 +80,9 @@
 		 * @param	repeat		Put 0 to get infinite loop
 		 */
 		public static function makeMP3Loop(name:String, samples:uint, repeat:int = 0,
-											soundTransform:SoundTransform = null):SoundProperties
+											soundTransform:SoundTransform = null):SoundProperty
 		{
-			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.MP3_LOOP,
+			var sp:SoundProperty = new SoundProperty(name, SoundTypes.MP3_LOOP,
 														soundTransform, repeat, samples);
 			return sp;
 		}
@@ -95,20 +95,17 @@
 		 * @param	truncate	The early termination point of the clip. In Milliseconds.
 		 */
 		public static function makeClip(name:String, offset:uint = 0, truncate:uint = 0,
-										soundTransform:SoundTransform = null):SoundProperties
+										soundTransform:SoundTransform = null):SoundProperty
 		{
-			var sp:SoundProperties = new SoundProperties(name, E_SoundTypes.NON_LOOP,
+			var sp:SoundProperty = new SoundProperty(name, SoundTypes.NON_LOOP,
 														soundTransform, -1, 0, offset, truncate);
 			return sp;
 		}
 		
 		// -------------------------------- PROPERTIES -------------------------------
 		
-		/** Name of the sound, for trivial identification purposes only. */
-		public function get name():String	{	return _name;	}
-		
 		/** The type of sound it is. */
-		public function get type():E_SoundTypes	{	return _type;	}
+		public function get type():SoundTypes	{	return _type;	}
 		
 		/** The number of times this sound should repeat itself. */
 		public function get repeat():int	{	return _repeat;	}

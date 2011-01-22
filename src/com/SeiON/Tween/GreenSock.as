@@ -5,10 +5,10 @@ package com.SeiON.Tween
 	/**
 	 * This is an ITween of GreenSock's Animation classes.
 	 */
-	public class GreenSock implements ITween
+	public final class GreenSock implements ITween
 	{
 		private var _tween:TimelineLite;
-		private var _type:E_TweenTypes;
+		private var _type:TweenTypes;
 		
 		/**
 		 * Creates a wrapper over a TimelineLite object of GreenSock, eg. TimelineMax,
@@ -47,8 +47,8 @@ package com.SeiON.Tween
 		}
 		
 		/** Sets the tweening behaviour type to be used for ISoundClip. (ITween) */
-		public function get type():E_TweenTypes {	return _type;	}
-		public function set type(value:E_TweenTypes):void	{	_type = value;	}
+		public function get type():TweenTypes {	return _type;	}
+		public function set type(value:TweenTypes):void	{	_type = value;	}
 		
 		/** Plays the Tween forward from the beginning. (ITween) */
 		public function play():void {	_tween.restart();	}

@@ -7,10 +7,12 @@
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
+	import flash.utils.getQualifiedClassName;
 	
 	import com.SeiON.Misc.CountDown;
 	import com.SeiON.Tween.ITween;
-	import com.SeiON.Tween.E_TweenTypes;
+	import com.SeiON.Tween.TweenTypes;
+	import com.SeiON.Types.SoundProperty;
 	
 	/**
 	 * Our Audio Library's fundamental concept of a playable sound object. Contains internal
@@ -38,7 +40,7 @@
 		 */
 		protected var sound:Sound;
 		protected var soundChannel:SoundChannel;
-		private var sndProperties:SoundProperties;
+		private var sndProperties:SoundProperty;
 		protected var sndTransform:SoundTransform;
 		protected var _volume:Number = 1.0;
 		protected var _pan:Number = 0;
@@ -55,7 +57,7 @@
 		 * spareAllocation: Used by SoundManager to check if this clip was borrowed from SoundMaster
 		 */
 		private var _manager:SoundGroup;
-		protected var autodispose:Boolean;
+		protected var _autodispose:Boolean;
 		private var _spareAllocation:Boolean;
 		
 		/**
@@ -69,7 +71,7 @@
 		 *
 		 * @see SoundGroup.createSound()
 		 */
-		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperties,
+		public function SoundClip(manager:SoundGroup, snd:Sound, sndProperties:SoundProperty,
 								autodispose:Boolean, spareAllocation:Boolean, secretKey:*)
 		{
 			if (secretKey != manager.killSound)
@@ -85,16 +87,16 @@
 			
 			// Parent control
 			this._manager = manager;
-			this.autodispose = autodispose;
+			this._autodispose = autodispose;
 			this._spareAllocation = spareAllocation;
 			
 			_dispatcher = new EventDispatcher();
 			_tween = new SoundMaster.tweenCls() as ITween;
 			_tween.play();
 			if (sndProperties.repeat == -1)
-				_tween.type = E_TweenTypes.LINEAR;
+				_tween.type = TweenTypes.LINEAR;
 			else
-				_tween.type = E_TweenTypes.CYCLIC;
+				_tween.type = TweenTypes.CYCLIC;
 		}
 		
 		/** Clears all references held. This object is now invalid. (ISoundClip) */
@@ -205,10 +207,17 @@
 		}
 		
 		// ----------------------------------- PROPERTIES ---------------------------------
+		
+		/** Read-only. The fully qualified name of the sound class that was playing. */
+		public function get soundCls():String	{	return getQualifiedClassName(sound);	}
+		
 		/** Read-only. Returns the manager that holds this ISoundClip. */
 		public function get manager():SoundGroup {	return _manager;	}
 		
-		/** Read-only. Used by SoundManager to check if this clip was borrowed from SoundMaster. (ISoundClip) */
+		/** Read-only. Whether this sound is auto-disposable. */
+		public function get autodispose():Boolean {	return _autodispose;	}
+		
+		/** Read-only. Used by SoundManager to check if this clip was a borrowed spare. (ISoundClip) */
 		public function get spareAllocation():Boolean {		return _spareAllocation;	}
 		
 		/** Read-only. Fires off Event.SOUND_COMPLETE and/or SoundClip.SOUND_REPEAT. (ISoundControl) */
@@ -286,7 +295,7 @@
 		{
 			_tween = value;
 			
-			if (_tween.type == E_TweenTypes.CYCLIC)
+			if (_tween.type == TweenTypes.CYCLIC)
 				_tween.position = this.position;
 			
 			if (isPaused())
@@ -302,7 +311,7 @@
 		 *
 		 * ISoundClip
 		 */
-		public function get soundProperties():SoundProperties	{	return sndProperties.clone();	}
+		public function get soundproperty():SoundProperty	{	return sndProperties.clone();	}
 		
 		/**
 		 * How many more times the ISoundClip has to repeat itself. A value of -1 means that this
@@ -373,7 +382,7 @@
 			play();
 			
 			_repeat = tmpRepeat;
-			if (_tween.type == E_TweenTypes.LINEAR)
+			if (_tween.type == TweenTypes.LINEAR)
 				_tween.position = tmpTweenPos;
 			
 			/* If LINEAR => resume _tween.position
