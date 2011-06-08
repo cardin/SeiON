@@ -5,7 +5,8 @@
 	import flash.utils.getTimer;
 	
 	/**
-	 * Counts down a specified time and triggers TimerEvent when it is done.
+	 * A countdown timer that will trigger TimerEvent when it is done. Used by SeiON to prematurely
+	 * end sounds (aka truncate).
 	 */
 	public final class CountDown extends Timer
 	{
@@ -22,7 +23,7 @@
 		private var _paused:Boolean = false;
 		
 		/**
-		 * @param	time	In Milliseconds.
+		 * @param	time	The countdown timing. (Milliseconds)
 		 */
 		public function CountDown(time:int)
 		{
@@ -32,7 +33,7 @@
 		
 		// --------------------------------- PROPERTIES ----------------------------------
 		
-		/** Whether the Timer is paused or not. READ-ONLY. */
+		/** Whether the Timer is paused or not. */
 		public function get paused():Boolean {	return _paused;	}
 		
 		/** The amount of time remaining in the countdown, in milliseconds. */
@@ -49,7 +50,7 @@
 			}
 		}
 		
-		/** This property has been rendered useless. */
+		/** @private */
 		override public function get repeatCount():int {	return 1;	}
 		override public function set repeatCount(value:int):void {}
 		
@@ -58,8 +59,7 @@
 		 * default to 0. If delay = 0, CountDown will refuse to start.
 		 *
 		 * If you set a new delay time while Timer is running or paused, the Timer will either
-		 * reset or restart itself.
-		 *
+		 * reset or restart itself respectively.
 		 */
 		override public function get delay():Number {	return originalDelay;	}
 		override public function set delay(value:Number):void

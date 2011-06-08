@@ -1,24 +1,29 @@
-![The SeiON Actionscript3 Sound Library](http://img141.imageshack.us/img141/671/seionlogo.png)
+![The SeiON Actionscript3 Sound Engine](http://img141.imageshack.us/img141/671/seionlogo.png)
 
 ### What is SeiON?
-SeiON is an Actionscript 3 Sound Library. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex. By instantiating Sound objects through SeiON, you can have a layered approach to handling your sound playback. SeiON also incorporates an sound allocation system so that you don't have to keep track of every single sound instance, and will automatically dispose of them once they finish playback. By properly categorising sounds, SeiON will be able to recycle sounds and ensure that you'll always be able to keep playing more sounds without hitting the SoundChannel limit for the Flash Player.
+SeiON is an Actionscript 3 Sound Engine. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex.
 
-In short, SeiON does the following:
-
-* Provides a global sound manager for allocating sound instances in the Flash environment
+SeiON does the following:
+* Provides global control of all sounds played
 * Allows for pause/resume playback for sounds.
-* Provides an interface for playback of gapless MP3 loops in Flex.
-* Keeps track of and auto-disposes finished/unwanted sound instances.
-* Recycles sounds for continual creation of more sounds.
+* Provides ability for playback of gapless MP3 loops in Flex.
+* Manages finished/unwanted sound instances.
 
-Visit the wiki for more details: <http://github.com/cardin/SeiON/wiki/>
+As SeiON only accepts Sound() objects as input, it is most suitable for embedded sounds, sounds on the local filesystem, or sounds that do not require streaming.
+
+Visit the wiki for tutorials & details: <http://github.com/cardin/SeiON/wiki/>
 
 * * *
 
-###About The Animation Library
-SeiON comes with GreenSock's Tweening Library, which can be used to chain animation events to SeiON internally. Usage of GreenSock is opt-in by initialising the engine at the start of the program.
+####File Manifest
 
-GreenSock's Tweening Library comes under its own license, and is free for non-commercial usage. You can visit <http://www.greensock.com/licensing/> to learn more about it.
+	bin/ - The SeiON.swc file
+	lib/ - MP3 and Wave files embedded in the demo tests
+	src/ - The Actionscript source folder
+	test/ - Demo tests
+	LICENSE.txt - Project MIT License
+	README.markdown - This description file that you're reading
+	SeiON.as3proj - FlashDevelop project file
 
 * * *
 

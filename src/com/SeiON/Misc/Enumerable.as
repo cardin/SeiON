@@ -30,14 +30,20 @@
 		LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 		OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 		THE SOFTWARE.
+	 */
+	
+	import flash.utils.describeType;
+	import flash.utils.getQualifiedClassName;
+	
+	/**
+	 * Assists in the creation of faux enumeration datatypes.
 	 *
-	 * @usage
-	 * ----------------------------- USAGE ------------------------------
+	 * @example
 	 * To use this, you need to call initEnum in a static initializer within the constructor of
 	 * the class you want to make into an Enumerator.
-	 *
+	
 	 * For instance, for an Enumeration called DaysInWeek, it will look like this:
-		
+	 * <listing version="3.0">
 		public class DaysInWeek extends Enumerable
 		{
 			public static const MONDAY:DaysInWeek = new DaysInWeek();
@@ -53,19 +59,25 @@
 				initEnum(DaysInWeek);
 			}
 		}
-		
+	 * </listing>
+	
 	 * Usage-wise, you can refer to it using its value or its string value:
+	 * <listing version="3.0">
 		trace(DaysInWeek.MONDAY.valueOf()); // 3
 		trace(DaysInWeek.MONDAY.toString()); // Monday
+	 * </listing>
 	
 	 * You can also retrieve the Enum constant using its value:
+	 * <listing version="3.0">
 		var theDay:DaysInWeek = Enumerable.retrieveValue(1, DaysInWeek) as DaysInWeek;
 		trace(theDay.toString()); // Friday
+	 * </listing>
 		
 	 * Notice how the value of the Enumerable does not match the sequence at which it is written.
 	 * That is typical of the Flash environment, as it does not instantiate sequentially. If you
 	 * want to set your own index so the index value has a sort of sequence, you can. But it can
 	 * be tedious, and very nearly defeats the purpose of an automated enumerated class:
+	 * <listing version="3.0">
 		public class DaysInWeek extends Enumerable
 		{
 			public static const MONDAY:DaysInWeek = new DaysInWeek();
@@ -92,21 +104,19 @@
 				SPECIAL_DAY.index = 99999;
 			}
 		}
+	 * </listing>
+	
 	 * Notes for the above method:
-	 * 	- The index does not have to be sequential.
-	 *  - You must NOT repeat indexes. If there are repeat indexes, no error will be thrown, but
-	 * 	  your index will keep returning weird values.
-	 */
-	
-	import flash.utils.describeType;
-	import flash.utils.getQualifiedClassName;
-	
-	/**
-	 * Assists in the creation of faux enumeration datatypes.
+	 * <ul>
+	 * <li>The index does not have to be sequential.</li>
+	 * <li>You must NOT repeat indexes. If there are repeat indexes, no error will be thrown, but
+	 * 	  your index will keep returning weird values.</li>
+	 * </ul>
 	 */
 	public class Enumerable
 	{
 		private var constName:String;
+		/**@private*/
 		protected var index:uint;
 		
 		/**
