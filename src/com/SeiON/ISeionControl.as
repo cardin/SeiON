@@ -15,8 +15,8 @@ package com.SeiON
 		function get isPaused():Boolean;
 		
 		/**
-		 * Get: The volume as affected by its parent.
-		 * Set: The personal adjustable volume unaffected by anything.
+		 * Get: The volume as affected by its parent. <p></p>
+		 * Set: The personal adjustable volume unaffected by anything. <p></p>
 		 *
 		 * ISeionControl
 		 */
@@ -24,8 +24,8 @@ package com.SeiON
 		function set volume(value:Number):void;
 		
 		/**
-		 * Get: The panning as affected by its parent.
-		 * Set: The personal adjustable panning unaffected by anything.
+		 * Get: The panning as affected by its parent. <p></p>
+		 * Set: The personal adjustable panning unaffected by anything. <p></p>
 		 *
 		 * ISeionControl
 		 */

@@ -21,7 +21,7 @@ package com.SeiON
     */
 
 	/**
-	 * An ISeionClip that can adjust pitch, and change starting offset, truncation, by specifying
+	 * An ISeionInstance that can adjust pitch, and change starting offset, truncation, by specifying
 	 * a byte range.
 	 */
     public final class SeionBytes extends SeionClip

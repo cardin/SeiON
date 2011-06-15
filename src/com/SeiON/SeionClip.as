@@ -1,6 +1,5 @@
 ﻿package com.SeiON
 {
-	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
@@ -9,127 +8,100 @@
 	import flash.media.SoundTransform;
 	
 	import com.SeiON.Core.SeionEvent;
-	import com.SeiON.Core.SeionProperty;
 	import com.SeiON.Misc.CountDown;
 	
 	/**
-	 * An ISeionClip that plays sounds. SeiON's fundamental concept of a playable sound object. <p></p>
+	 * The simplest way to play a _snd.<p></p>
 	 *
-	 * It's a wrapper over both the native Sound and the SoundChannel object in Flash. It adds
-	 * animation, loop and control to sound in Flash. It is managed by SeionGroup as part of
-	 * SeiON's effort to control the no. of SoundChannels playing simultaneously. <p></p>
+	 * SeionClip is a simple wrapper over both the native Sound and the _sndChannel object in
+	 * Flash.<p></p>
 	 *
-	 * Use SeionGroup's factory method createSound() to create SeionClips.
+	 * Use SeionClip.create() to instantiate this class.
 	 *
-	 * @see SeionGroup
-	 * @see SeionGroup#createSound()
-	 * @see Seion
+	 * @see #create()
 	 */
-	public class SeionClip implements ISeionClip
+	public class SeionClip extends SeionInstance
 	{
-		/** -- Sound Assets --
-		 * _name: Name of this clip, non-unique.
+		/**
+		 * _offset:		The delayed starting position.
+		 * _truncate:	The shorted ending position.
 		 *
-		 * sound: Flash Native sound object, is a memory link to a specific audio waveform
-		 * soundChannel: Flash Native sound playback control, created when playing Sound objects
-		 * sndProperties: The properties of the sound that we are holding
-		 * _volume: Values between 0.0 - 1.0, they represent the adjustable range of the sound
-		 * _pan: Values between -1.0 - 0.0, they represent the adjustable panning of the sound
-		 *
-		 * _dispatcher: The place to listen for events from SeionClip.
-		 * _repeat: How many more times the sound has to repeat itself.
-		 * pausedLocation: Where the sound was paused, so you can pause()/resume()
-		 * truncation: Keeps track of where the sound will end.
+		 * pausedLocation:	Where the _snd was paused, so you can pause()/resume()
+		 * truncation:		Keeps track of where the _snd will end.
 		 */
-		private var _name:String = "";
-		/** @private */
-		protected var sound:Sound; /** @private */
-		protected var soundChannel:SoundChannel;
-		private var sndProperties:SeionProperty; /** @private */
-		protected var sndTransform:SoundTransform; /** @private */
-		protected var _volume:Number = 1.0; /** @private */
-		protected var _pan:Number = 0;
+		private var _offset:uint = 0;
+		private var _truncate:uint = 0;
 		
-		private var _dispatcher:EventDispatcher;
-		private var _repeat:int;
 		private var pausedLocation:Number = -1;
 		public var truncation:CountDown;
 		
-		/** -- Manager vars --
-		 * _manager: the SeionGroup that this SeionClip belongs to
-		 * _autodispose: If true, this SeionGroup shall be auto-disposed
-		 */
-		private var _manager:SeionGroup; /** @private */
-		protected var _autodispose:Boolean; /** @private */
-		
 		/**
 		 * Please do not call this constructor directly; it will throw an error. Call it through
-		 * SeionGroup.createSound().
+		 * SeionClip.create().
 		 *
-		 * @param 	secretKey		Does nothing, just forces a reminder not to use constructor...
-		 *
-		 * @throws	IllegalOperationError	When you try to directly instantiate ISeionClip without
-		 * using SeionGroup.createSound().
-		 *
-		 * @see SeionGroup#createSound()
+		 * @see SeionClip#create()
 		 */
-		public function SeionClip(name:String, manager:SeionGroup, snd:Sound,
-								sndProperties:SeionProperty, autodispose:Boolean, secretKey:*)
+		public function SeionClip(name:String, manager:SeionGroup, snd:Sound, repeat:int,
+								sndTransform:SoundTransform, autodispose:Boolean, secretKey:*)
 		{
-			if (secretKey != manager.killSound)
-				throw new IllegalOperationError("ISeionClip's constructor not allowed for direct "
-				+ "access! Please use SeionClip.create() instead.");
-			
-			// Flash Sound characteristics
-			this._name = name;
-			this.sound = snd;
-			this.sndProperties = sndProperties.clone();
-			this.sndTransform = new SoundTransform(sndProperties.sndTransform.volume,
-													sndProperties.sndTransform.pan);
-			this._repeat = sndProperties.repeat;
-			
-			// Parent control
-			this._manager = manager;
-			this._autodispose = autodispose;
-			
-			_dispatcher = new EventDispatcher();
+			super(name, manager, snd, repeat, autodispose, sndTransform, secretKey);
 		}
 		
-		/** Clears all references held. This object is now invalid. (ISeionClip) */
+		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int,
+					sndTransform:SoundTransform = null, autodispose:Boolean = true):SeionClip
+		{
+			///TODO complete SeionClip.create()
+		}
+		
+		/**
+		 * Creates a sound clip that is shorted.
+		 * @param	name	Any name, even a non-unique one.
+		 * @param	manager	The SeionGroup that manages this SeionClip. Immutable.
+		 * @param	snd 	The sound data. Immutable.
+		 * @param	repeat	How many times to repeat the clip.
+		 * @param	sndTransform	The fixed internal property for the sound.
+		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
+		 * @param	offset		The delayed starting position. Immutable.
+		 * @param	truncate	The shorted ending position. Immutable.
+		 *
+		 * @return	A SeionClip is allocation was successful. Null if allocation failed, or
+		 * autodispose is true.
+		 */
+		public static function createExcerpt(name:String, manager:SeionGroup, snd:Sound, repeat:int,
+					sndTransform:SoundTransform, autodispose:Boolean,
+					offset:Number, truncate:Number):SeionClip
+		{
+			var a:SeionClip = create(name, manager, snd, repeat, sndTransform, autodispose);
+			if (a != null)
+			{
+				a._offset = offset;
+				a._truncate = truncate;
+			}
+			return a;
+		}
+		
+		/** Clears all references held. This object is now invalid. (ISeionInstance) */
 		public function dispose():void
 		{
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
+			// Checking for dispose
+			if (isDisposed())	return;
 			
 			stop();
-			
-			_dispatcher = null;
 			
 			// truncation.stop() alrdy done in dispose's stop() above
 			truncation = null;
 			
-			sound = null;
-			sndTransform = null;
-			sndProperties.dispose();
-			sndProperties = null;
 			_manager.killSound(this);
-			_manager = null;
+			super.dispose();
 		}
 		
 		// ---------------------------------- PLAYBACK CONTROLS ----------------------------
 		
-		/** Plays the sound from the beginning again according to sndProperties. (ISeionClip) */
+		/** Plays the _snd from the beginning again according to sndProperties. (ISeionInstance) */
 		public function play():void
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
+			if (isDisposed())	return;
 			
 			stop(); // for safety's sake
 			
@@ -145,23 +117,19 @@
 			resume();
 		}
 		
-		/** Stops the sound and resets it to Zero. (ISeionClip) */
+		/** Stops the _snd and resets it to Zero. (ISeionInstance) */
 		public function stop():void
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
+			if (isDisposed())	return;
 			
 			if (isPlaying || isPaused)
 			{
-				if (soundChannel)
+				if (_sndChannel)
 				{
-					soundChannel.stop();
-					soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-					soundChannel = null;
+					_sndChannel.stop();
+					_sndChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+					_sndChannel = null;
 				}
 				// reset variables
 				if (truncation) // 'cos play() calls stop() before truncation is even created
@@ -175,15 +143,11 @@
 			}
 		}
 		
-		/** Resumes playback of sound. (ISeionControl) */
+		/** Resumes playback of _snd. (ISeionControl) */
 		public function resume():void
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
+			if (isDisposed())	return;
 			
 			// if manager is paused, no resuming allowed!
 			if (_manager.isPaused)	return;
@@ -198,15 +162,15 @@
 				// resuming truncation
 				truncation.resume();
 				
-				// starting up the sound
-				soundChannel = sound.play(pausedLocation, 0, sndTransform);
+				// starting up the _snd
+				_sndChannel = _snd.play(pausedLocation, 0, sndTransform);
 				
-				/* The sound might be so short that it finishes before the code executes.
+				/* The _snd might be so short that it finishes before the code executes.
 				 * Just in case.
 				 * */
-				if (soundChannel)
+				if (_sndChannel)
 				{
-					soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+					_sndChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 					pausedLocation = -1;
 				}
 				else
@@ -214,47 +178,29 @@
 			}
 		}
 		
-		/** Pauses playback of sound. (ISeionControl) */
+		/** Pauses playback of _snd. (ISeionControl) */
 		public function pause():void
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
+			if (isDisposed())	return;
 			
 			// pause is only valid if it were playing in the 1st place
 			if (isPlaying)
 			{
-				pausedLocation = soundChannel.position;
-				soundChannel.stop();
-				soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-				soundChannel = null;
+				pausedLocation = _sndChannel.position;
+				_sndChannel.stop();
+				_sndChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				_sndChannel = null;
 				
 				truncation.pause();
 			}
 		}
 		
 		// ----------------------------------- PROPERTIES ---------------------------------
-		/** Name of this clip, non-unique. (ISeionClip) */
-		public function get name():String	{	return _name;	}
-		public function set name(value:String):void	{	_name = value;	}
-		
-		/** Returns the manager that holds this ISeionClip. (ISeionClip) */
-		public function get manager():SeionGroup {	return _manager;	}
-		
-		/** Whether this sound is auto-disposable. (ISeionClip) */
-		public function get autodispose():Boolean {	return _autodispose;	}
-		
-		/** The EventListener for listening to Event.SOUND_COMPLETE and/or SeionClip.SOUND_REPEAT.
-		 * (ISeionClip) */
-		public function get dispatcher():EventDispatcher {	return _dispatcher;	}
-		
-		/** Is the sound active? (ISeionClip) */
+		/** Is the sound active? (ISeionInstance) */
 		public function get isPlaying():Boolean
 		{
-			if (soundChannel)
+			if (_sndChannel)
 				return true;
 			return false;
 		}
@@ -267,133 +213,32 @@
 			return true;
 		}
 		
-		/**
-		 * Get: The volume as affected by its parent. <p></p>
-		 * Set: The personal adjustable volume unaffected by anything. <p></p>
-		 *
-		 * ISeionControl
-		 */
-		public function get volume():Number {	return _volume;	}
-		public function set volume(value:Number):void
-		{
-			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
-			
-			_volume = value;
-			
-			// final Volume = native Volume * current Volume * parent's volume
-			sndTransform.volume = sndProperties.sndTransform.volume * _volume * _manager.volume;
-			
-			if (isPlaying)
-				soundChannel.soundTransform = sndTransform;
-		}
-		
-		/**
-		 * Get: The panning as affected by its parent. <p></p>
-		 * Set: The personal adjustable panning unaffected by anything. <p></p>
-		 *
-		 * ISeionControl
-		 */
-		public function get pan():Number {	return _pan; }
-		public function set pan(value:Number):void
-		{
-			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
-			
-			_pan = value;
-			
-			var desiredDir:int = (_pan > 0) ? 1 : -1;
-			var amtToMove:Number = (desiredDir - sndProperties.sndTransform.pan) * Math.abs(_pan);
-			sndTransform.pan = amtToMove + sndProperties.sndTransform.pan;
-			
-			//adding on the parent's panning
-			desiredDir = (_manager.pan > 0) ? 1 : -1;
-			amtToMove = (desiredDir - sndTransform.pan) * Math.abs(_manager.pan);
-			sndTransform.pan = amtToMove + sndTransform.pan;
-			
-			if (isPlaying)
-				soundChannel.soundTransform = sndTransform;
-		}
-		
-		/**
-		 * Returns the predefined sound properties of the sound. <p></p>
-		 *
-		 * <b>NOTE:</b> You're given a cloned copy. Remember to call dispose() to facilitate GC
-		 * disposal. <p></p>
-		 *
-		 * ISeionClip
-		 */
-		public function get soundproperty():SeionProperty	{	return sndProperties.clone();	}
-		
-		/**
-		 * How many more times the ISeionClip has to repeat itself. A value of -1 means that this
-		 * is not going to repeat anymore. <p></p>
-		 *
-		 * You are only allowed to set repeat values lower than or equals to the native repeat
-		 * count specified in soundproperty.repeat. <p></p>
-		 *
-		 * ISeionClip
-		 *
-		 * @see	#soundproperty
-		 */
-		public function get repeat():int	{	return _repeat;	}
-		public function set repeat(value:int):void
-		{
-			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return;
-			}
-			
-			if (value > sndProperties.repeat)
-				value = sndProperties.repeat;
-			
-			_repeat = value;
-		}
-		
-		/** The total length of the clip, excluding repeats. In Milliseconds. (ISeionClip) */
+		/** The total length of the clip, excluding repeats. In Milliseconds. (ISeionInstance) */
 		public function get length():Number
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return 0;
-			}
+			if (isDisposed())	return 0.0;
 			
-			return (sndProperties.duration == 0) ? sound.length : sndProperties.duration;
+			return (sndProperties.duration == 0) ? _snd.length : sndProperties.duration;
 		}
 		
-		/** How far into the clip we are. In Milliseconds. (ISeionClip) <p></p>
-		 * Includes offsets or truncated durations, eg. a 10 second sound with 5 seconds offset at
+		/** How far into the clip we are. In Milliseconds. (ISeionInstance) <p></p>
+		 * Includes offsets or truncated durations, eg. a 10 second _snd with 5 seconds offset at
 		 * starting position would report a position of 0, not 5. */
 		public function get position():Number
 		{
 			// Checking for dispose
-			if (manager == null)
-			{
-				trace("This SeionClip is already disposed, stop using this null reference!");
-				return 0;
-			}
+			if (isDisposed())	return 0.0;
 			
 			if (isPaused)
 				return pausedLocation - sndProperties.offset;
-			else if (soundChannel == null) //clip not started yet
+			else if (!isPlaying) //clip not started yet
 				return 0;
-			return soundChannel.position - sndProperties.offset;
+			return _sndChannel.position - sndProperties.offset;
 		}
 		
-		/** How far into the clip we are, from 0.0 - 1.0. (ISeionClip) <p></p>
-		 * Includes offsets or truncations, eg. a 100 second sound with 5 seconds offset at
+		/** How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>
+		 * Includes offsets or truncations, eg. a 100 second _snd with 5 seconds offset at
 		 * starting position would report a position of 0.0, not 0.95. */
 		public function get progress():Number
 		{
@@ -402,7 +247,7 @@
 		
 		// -------------------------------- PRIVATE HELPER METHODS --------------------------
 		/**
-		 * Called when a sound completes. As for autodispose sounds, they self-dispose.
+		 * Called when a _snd completes. As for autodispose _snds, they self-dispose.
 		 *
 		 * @param	e	Not important. e == null when truncation cuts it short, else this function
 		 * 				was called by Event.SOUND_COMPLETE.
@@ -421,11 +266,11 @@
 					repeat = -1;
 				
 				repeatSound();
-				_dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
+				dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
 			}
 			else // disposing
 			{
-				_dispatcher.dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
+				dispatcher.dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
 				
 				if (autodispose)

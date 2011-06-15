@@ -6,7 +6,7 @@
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
-	import com.SeiON.ISeionClip;
+	import com.SeiON.ISeionInstance;
 	import com.SeiON.Core.SeionProperty;
 	
 	/**
@@ -48,8 +48,8 @@
 		 * we fade bg music to open up a sub-menu. Auto-disposables are a must, so as to be
 		 * cannibalised to free up more allocation.
 		 */
-		private var list:Vector.<ISeionClip> = new Vector.<ISeionClip>();
-		private var autoList:Vector.<ISeionClip> = new Vector.<ISeionClip>();
+		private var list:Vector.<ISeionInstance> = new Vector.<ISeionInstance>();
+		private var autoList:Vector.<ISeionInstance> = new Vector.<ISeionInstance>();
 		private var fullAlloc:uint;
 		private var availAmt:uint;
 		private var borrowedAmt:uint;
@@ -80,11 +80,7 @@
 		public function dispose():void
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return;
-			}
+			if (isDisposed()) return false;
 			
 			while (list.length > 0)
 				list.pop().dispose();
@@ -104,11 +100,7 @@
 		public function resume():void
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return;
-			}
+			if (isDisposed()) return false;
 			
 			// If Seion is paused, we do not resume
 			if (Seion._this.isPaused)	return;
@@ -117,7 +109,7 @@
 			{
 				_pause = false;
 				
-				var sc:ISeionClip;
+				var sc:ISeionInstance;
 				for each (sc in list)
 					sc.resume();
 				for each (sc in autoList)
@@ -129,17 +121,13 @@
 		public function pause():void
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return;
-			}
+			if (isDisposed()) return false;
 			
 			if (!isPaused)
 			{
 				_pause = true;
 				
-				var sc:ISeionClip;
+				var sc:ISeionInstance;
 				for each (sc in list)
 					sc.pause();
 				for each (sc in autoList)
@@ -161,8 +149,11 @@
 		public function get volume():Number	{	return _volume * Seion._this.volume;	}
 		public function set volume(value:Number):void
 		{
+			// Checking for dispose
+			if (isDisposed()) return false;
+			
 			_volume = value;
-			var sc:ISeionClip;
+			var sc:ISeionInstance;
 			for each (sc in list)
 				sc.volume = sc.volume;
 			for each (sc in autoList)
@@ -183,8 +174,11 @@
 		}
 		public function set pan(value:Number):void
 		{
+			// Checking for dispose
+			if (isDisposed()) return false;
+			
 			_pan = value;
-			var sc:ISeionClip;
+			var sc:ISeionInstance;
 			for each (sc in list)
 				sc.pan = sc.pan;
 			for each (sc in autoList)
@@ -214,15 +208,18 @@
 		 * @return	null, if: <ol>
 		 * <li>No allocation is available.</li>
 		 * <li>You created an autodispose sound.</li></ol>
-		 * Else, it will return a handle to the ISeionClip you created.
+		 * Else, it will return a handle to the ISeionInstance you created.
 		 */
 		public function createSound(name:String, snd:Sound, sndProperties:SeionProperty,
-									autodispose:Boolean = true):ISeionClip
+									autodispose:Boolean = true):ISeionInstance
 		{
+			// Checking for dispose
+			if (isDisposed()) return false;
+			
 			if (snd == null || sndProperties == null)
 				throw new ArgumentError("Arguments cannot be null!");
 			
-			var sc:ISeionClip;
+			var sc:ISeionInstance;
 			if (sndProperties.isMilliseconds)
 				sc = new SeionClip(name, this, snd, sndProperties, autodispose, killSound);
 			else
@@ -253,11 +250,7 @@
 		public function killAllAutoSounds():void
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return;
-			}
+			if (isDisposed()) return false;
 			
 			// topping up the amounts
 			availAmt += autoList.length - borrowedAmt;
@@ -275,11 +268,7 @@
 		public function killAllSounds():void
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return;
-			}
+			if (isDisposed()) return false;
 			
 			killAllAutoSounds();
 			availAmt = fullAlloc;
@@ -290,12 +279,12 @@
 		}
 		
 		/**
-		 * Removes the sound from list. This is usually called from within ISeionClip.dispose().
+		 * Removes the sound from list. This is usually called from within ISeionInstance.dispose().
 		 * @param	sc		If sc does not exist in this SeionGroup, nothing happens.
 		 *
 		 * @private
 		 */
-		internal function killSound(sc:ISeionClip = null):void
+		internal function killSound(sc:ISeionInstance = null):void
 		{
 			/* If null, it means Seion called this method. It wants to kill an autodisposable
 			 * sound, in the hopes that enough allocation is freed to generate another SeionGroup.
@@ -306,7 +295,7 @@
 				sc = autoList[0];
 			}
 			
-			// proceeding to destroy the ISeionClip
+			// proceeding to destroy the ISeionInstance
 			if (autoList.indexOf(sc) > -1)
 				autoList.splice(autoList.indexOf(sc), 1);
 			else if (list.indexOf(sc) > -1)
@@ -328,14 +317,10 @@
 		 * Queries for additional allocation.
 		 * @return	True if allocation is possible.
 		 */
-		private function alloc(snd:ISeionClip):Boolean
+		private function alloc(snd:ISeionInstance):Boolean
 		{
 			// Checking for dispose
-			if (autoList == null)
-			{
-				trace("This SeionGroup's already disposed, stop using a null reference!");
-				return false;
-			}
+			if (isDisposed()) return false;
 			
 			// if not enough
 			if (availAmt <= 0)
@@ -374,7 +359,7 @@
 		}
 		
 		/**
-		 * Returns an array of all ISeionClips' details.
+		 * Returns an array of all ISeionInstances' details.
 		 * name:		name of the sound class
 		 * ad:			Auto diposable?
 		 * playing:		Does it hold a sound channel
@@ -384,14 +369,14 @@
 		 */
 		internal function stats():Array
 		{
-			/* This function is here and not in ISeionClip is because:
-			 * 1. ISeionClip would've made it public access
+			/* This function is here and not in ISeionInstance is because:
+			 * 1. ISeionInstance would've made it public access
 			 * 2. SeionGroup would still need to be the one polling, since only
 			 *    SeionGroup knows what it holds. (autoList/list is private)
 			 */
 			var arr:Array = new Array();
 			
-			var sc:ISeionClip, stat:Object;
+			var sc:ISeionInstance, stat:Object;
 			for each (sc in list)
 			{
 				stat = new Object();
@@ -413,6 +398,20 @@
 				arr.push(stat);
 			}
 			return arr;
+		}
+		
+		/**
+		 * Returns true if this instance is already disposed of.
+		 * @param	output	If true, a trace() is also printed.
+		 */
+		private function isDisposed(output:Boolean = true):Boolean
+		{
+			if (autoList == null)
+			{
+				if (output)	trace("This SeionGroup's already disposed, stop using a null reference!");
+				return true;
+			}
+			return false;
 		}
 	}
 }

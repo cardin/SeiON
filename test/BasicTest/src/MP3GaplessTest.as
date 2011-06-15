@@ -11,7 +11,7 @@ package
 	import flash.text.TextFieldAutoSize;
 	
 	import com.SeiON.Core.SeionProperty;
-	import com.SeiON.ISeionClip;
+	import com.SeiON.ISeionInstance;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
@@ -42,7 +42,7 @@ package
 		 * _mode: 0 = with gap, 1 = gapless
 		 */
 		private var testGrp:SeionGroup;
-		private var sndClip:ISeionClip;
+		private var sndClip:ISeionInstance;
 		
 		private var gap_prop:SeionProperty = SeionProperty.makeClip("", 0);
 		private var gapless_prop:SeionProperty = SeionProperty.makeMP3Gapless("", 124510);

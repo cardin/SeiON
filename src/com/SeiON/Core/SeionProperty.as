@@ -48,7 +48,7 @@
 		}
 		
 		/**
-		 * Clones itself. Might be especially pertinent to ISeionClip, as it disposes the
+		 * Clones itself. Might be especially pertinent to ISeionInstance, as it disposes the
 		 * SeionProperty that is passed in.
 		 *
 		 * @return	A deep copy of all members of SeionProperty.

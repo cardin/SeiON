@@ -51,7 +51,7 @@ package com.SeiON
 				output += "[" + sg.borrowedAllocation + "]";
 				output += (sg.isPaused ? "\n" : " (p)\n");
 				
-				// for each ISeionClip in SeionGroup
+				// for each ISeionInstance in SeionGroup
 				for each (var obj:Object in arr)
 				{
 					output += "     ";

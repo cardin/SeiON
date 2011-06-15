@@ -24,7 +24,7 @@ package com.SeiON
 	 */
 	
 	/**
-	 * An ISeionClip that plays gap-less looping MP3 sounds via specifying sample range.
+	 * An ISeionInstance that plays gap-less looping MP3 sounds via specifying sample range.
 	 *
 	 * @see https://github.com/cardin/SeiON/wiki/Gapless-MP3-Looping
 	 */
@@ -61,7 +61,7 @@ package com.SeiON
 			samplesTotal = sndProperties.duration;
 		}
 		
-		/** Clears all references held. This object is now invalid. (ISeionClip) */
+		/** Clears all references held. This object is now invalid. (ISeionInstance) */
 		override public function dispose():void
 		{
 			super.dispose();
@@ -70,14 +70,14 @@ package com.SeiON
 		
 		// ---------------------------------- PROPERTIES ---------------------------------
 		/** The total <u>sample</u> length of the clip, excluding repeats. <b>NOT</b> in
-		 * milliseconds, but in samples. (ISeionClip) */
+		 * milliseconds, but in samples. (ISeionInstance) */
 		override public function get length():Number
 		{
 			return samplesTotal;
 		}
 		
 		/**
-		 * How far into the clip we are. In Milliseconds. (ISeionClip) <p></p>
+		 * How far into the clip we are. In Milliseconds. (ISeionInstance) <p></p>
 		 * Includes offsets or truncations, eg. a 10 second sound with 5 seconds offset at
 		 * starting position would report a position of 0, not 5.
 		 */
@@ -87,7 +87,7 @@ package com.SeiON
 		}
 		
 		/**
-		 * How far into the clip we are, from 0.0 - 1.0. (ISeionClip) <p></p>
+		 * How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>
 		 * <b>Warning</b>:
 		 * The value may jerk around initially when sound is first played.
 		 */
@@ -109,7 +109,7 @@ package com.SeiON
 			return _latency;
 		}
 		
-		/** Is the sound active? (ISeionClip) */
+		/** Is the sound active? (ISeionInstance) */
 		override public function get isPlaying():Boolean
 		{
 			// Checking for dispose
@@ -130,7 +130,7 @@ package com.SeiON
 		
 		// ---------------------------------- PLAYBACK CONTROLS ---------------------------
 		
-		/** Plays the sound from the beginning again according to sndProperties. (ISeionClip) */
+		/** Plays the sound from the beginning again according to sndProperties. (ISeionInstance) */
 		override public function play():void
 		{
 			/*
@@ -157,7 +157,7 @@ package com.SeiON
 			resume();
 		}
 		
-		/** Stops the sound and resets it to Zero. (ISeionClip) */
+		/** Stops the sound and resets it to Zero. (ISeionInstance) */
 		override public function stop():void
 		{
 			// Checking for dispose

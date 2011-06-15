@@ -11,7 +11,7 @@ package
 	
 	import com.SeiON.Core.SeionEvent;
 	import com.SeiON.Core.SeionProperty;
-	import com.SeiON.ISeionClip;
+	import com.SeiON.ISeionInstance;
 	import com.SeiON.ISeionControl;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
@@ -104,14 +104,14 @@ package
 					this[name + "_SC"] = sg.createSound(name, this[name], this[name + "_prop"], false);
 					if (this[name + "_SC"] != null) // if null, tt means we weren't able to create
 					{
-						ISeionClip(this[name + "_SC"]).dispatcher.addEventListener(Event.SOUND_COMPLETE, onComplete);
-						ISeionClip(this[name + "_SC"]).play();
+						ISeionInstance(this[name + "_SC"]).dispatcher.addEventListener(Event.SOUND_COMPLETE, onComplete);
+						ISeionInstance(this[name + "_SC"]).play();
 					}
 				}
 				else //pause the sound
 				{
-					if (this[name + "_SC"].isPlaying)	ISeionClip(this[name + "_SC"]).pause();
-					else								ISeionClip(this[name + "_SC"]).resume();
+					if (this[name + "_SC"].isPlaying)	ISeionInstance(this[name + "_SC"]).pause();
+					else								ISeionInstance(this[name + "_SC"]).resume();
 				}
 			}
 		}
@@ -123,9 +123,9 @@ package
 		{
 			if (this[name + "_SC"] != null)
 			{
-				ISeionClip(this[name + "_SC"]).stop();
-				ISeionClip(this[name + "_SC"]).dispatcher.removeEventListener(Event.SOUND_COMPLETE, onComplete);
-				ISeionClip(this[name + "_SC"]).dispose();
+				ISeionInstance(this[name + "_SC"]).stop();
+				ISeionInstance(this[name + "_SC"]).dispatcher.removeEventListener(Event.SOUND_COMPLETE, onComplete);
+				ISeionInstance(this[name + "_SC"]).dispose();
 				this[name + "_SC"] = null;
 			}
 		}

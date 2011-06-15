@@ -112,7 +112,7 @@ package
 			descript.multiline = true;
 			descript.wordWrap = true;
 			descript.mouseEnabled = false;
-			descript.htmlText = "<p align='justify'>ISeionClips are created from a sound source "
+			descript.htmlText = "<p align='justify'>ISeionInstances are created from a sound source "
 				+ "and a SeionProperty. By having different SeionProperties, one can generate "
 				+ "variations using a single source. </p><br>"
 				+ "<p align='justify'>Besides volume and panning, SeionClips can also vary the "
