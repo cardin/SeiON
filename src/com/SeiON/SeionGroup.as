@@ -226,7 +226,7 @@
 			if (sndProperties.isMilliseconds)
 				sc = new SeionClip(name, this, snd, sndProperties, autodispose, killSound);
 			else
-				sc = new SeionMP3(name, this, snd, sndProperties, autodispose, killSound);
+				sc = new SeionSample(name, this, snd, sndProperties, autodispose, killSound);
 			
 			if (this.alloc(sc))
 			{

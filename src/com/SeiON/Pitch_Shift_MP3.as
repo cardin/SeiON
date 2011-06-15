@@ -18,7 +18,7 @@ package com.SeiON
     // Linkware: If you use this, kindly tweet/blog/post a link to it! =)
     */
 
-    public class Pitch_Shift_MP3
+    public final class Pitch_Shift_MP3
     {
         private const BLOCK_SIZE: int = 3072;
 		

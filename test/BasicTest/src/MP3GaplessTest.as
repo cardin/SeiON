@@ -15,7 +15,7 @@ package
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
-	import com.SeiON.SeionMP3;
+	import com.SeiON.SeionSample;
 	
 	import Components.Button;
 	import Components.ProgressBar;
@@ -36,7 +36,7 @@ package
 		 * sndClip: The SeionClip containing the Sound that we want to play.
 		 *
 		 * gap_prop: The SeionProperty for playing a typical sound (aka SeionClip).
-		 * gapless_prop: The SeionProperty for playing gapless MP3 (aka SeionMP3).
+		 * gapless_prop: The SeionProperty for playing gapless MP3 (aka SeionSample).
 		 *
 		 * _playStatus: 0 = not playing, 1 = paused, 2 = playing
 		 * _mode: 0 = with gap, 1 = gapless
@@ -159,9 +159,9 @@ package
 				+ "which can play native Flash Sound objects. However for MP3, the Flex compiler "
 				+ "cannot enable <u>gapless looping</u> playback of embedded MP3. Hence you'll "
 				+ "notice a mild pause at the end of every loop.</p><br>"
-				+ "<p align='justify'>Gapless MP3 Behaviour uses SeionMP3 to solve this problem. "
+				+ "<p align='justify'>Gapless MP3 Behaviour uses SeionSample to solve this problem. "
 				+ "However, the MP3 has to be encoded via the LAME MP3 encoder (eg. Audacity), "
-				+ "and the sample length value passed to SeiON. In addition, SeionMP3 is slightly "
+				+ "and the sample length value passed to SeiON. In addition, SeionSample is slightly "
 				+ "more CPU intensive than SeionClip.</p>";
 			descript.x = 25;
 			descript.y = 70;

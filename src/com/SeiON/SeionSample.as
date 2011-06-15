@@ -1,4 +1,4 @@
-﻿package com.SeiON
+package com.SeiON
 {
 	import flash.events.Event;
 	import flash.events.SampleDataEvent;
@@ -28,7 +28,7 @@
 	 *
 	 * @see https://github.com/cardin/SeiON/wiki/Gapless-MP3-Looping
 	 */
-	public final class SeionMP3 extends SeionClip
+	public final class SeionSample extends SeionClip
 	{
 		// -- Special Constants --
 		private const MAGIC_DELAY:Number = 2257.0; // LAME 3.98.2 + flash.media.Sound Delay
@@ -53,7 +53,7 @@
 		/**.
 		 * @inheritDoc
 		 */
-		public function SeionMP3(name:String, manager:SeionGroup, snd:Sound,
+		public function SeionSample(name:String, manager:SeionGroup, snd:Sound,
 								sndProperties:SeionProperty, autodispose:Boolean, secretKey:*)
 		{
 			super(name, manager, snd, sndProperties, autodispose, secretKey);
@@ -135,7 +135,7 @@
 		{
 			/*
 			 * Adapted from SeionClip.play(), changelog:
-			 *  1. Removed onRepeatPhase conditions. SeionMP3 repeats internally in
+			 *  1. Removed onRepeatPhase conditions. SeionSample repeats internally in
 			 * 		sampleData(), so no tweaking of play() is necessary for repeat conditions.
 			 *  2. Changed "starting up the sound" to reflect "out" variable
 			 *  3. Added _paused initialisation to force isPaused() to return true.

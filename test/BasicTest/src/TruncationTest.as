@@ -117,7 +117,7 @@ package
 				+ "variations using a single source. </p><br>"
 				+ "<p align='justify'>Besides volume and panning, SeionClips can also vary the "
 				+ "starting offset and duration. Here, shorter sounds are generated using portions "
-				+ "of a longer sound. Note that this feature is not available to SeionMP3.</p>";
+				+ "of a longer sound. Note that this feature is not available to SeionSample.</p>";
 			descript.x = 25;
 			descript.y = 10;
 			descript.width = 400;
