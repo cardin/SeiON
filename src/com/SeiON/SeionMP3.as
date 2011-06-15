@@ -70,7 +70,7 @@
 		
 		// ---------------------------------- PROPERTIES ---------------------------------
 		/** The total <u>sample</u> length of the clip, excluding repeats. <b>NOT</b> in
-		 * milliseconds. (ISeionClip) */
+		 * milliseconds, but in samples. (ISeionClip) */
 		override public function get length():Number
 		{
 			return samplesTotal;

@@ -200,13 +200,17 @@
 				
 				// starting up the sound
 				soundChannel = sound.play(pausedLocation, 0, sndTransform);
-				//if (soundChannel)
-				//{
+				
+				/* The sound might be so short that it finishes before the code executes.
+				 * Just in case.
+				 * */
+				if (soundChannel)
+				{
 					soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 					pausedLocation = -1;
-				//}
-				//else // the sound might be so short that it finishes before the code executes
-				//	onSoundComplete();
+				}
+				else
+					onSoundComplete();
 			}
 		}
 		
