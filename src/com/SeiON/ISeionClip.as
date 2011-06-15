@@ -31,7 +31,7 @@ package com.SeiON
 		/** Whether this sound is auto-disposable. (ISeionClip) */
 		function get autodispose():Boolean;
 		
-		/** Fires off Event.SOUND_COMPLETE and/or SeionClip.SOUND_REPEAT. (ISeionControl) */
+		/** Fires off Event.SOUND_COMPLETE and/or SeionClip.SOUND_REPEAT. (ISeionClip) */
 		function get dispatcher():EventDispatcher;
 		
 		/**

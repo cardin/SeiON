@@ -233,18 +233,18 @@
 		}
 		
 		// ----------------------------------- PROPERTIES ---------------------------------
-		/** Name of this clip, non-unique. */
+		/** Name of this clip, non-unique. (ISeionClip) */
 		public function get name():String	{	return _name;	}
 		public function set name(value:String):void	{	_name = value;	}
 		
-		/** Returns the manager that holds this ISeionClip. */
+		/** Returns the manager that holds this ISeionClip. (ISeionClip) */
 		public function get manager():SeionGroup {	return _manager;	}
 		
-		/** Whether this sound is auto-disposable. */
+		/** Whether this sound is auto-disposable. (ISeionClip) */
 		public function get autodispose():Boolean {	return _autodispose;	}
 		
 		/** The EventListener for listening to Event.SOUND_COMPLETE and/or SeionClip.SOUND_REPEAT.
-		 * (ISeionControl) */
+		 * (ISeionClip) */
 		public function get dispatcher():EventDispatcher {	return _dispatcher;	}
 		
 		/** Is the sound active? (ISeionClip) */
