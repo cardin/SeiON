@@ -24,7 +24,7 @@ package com.SeiON
 	 */
 	
 	/**
-	 * An ISeionClip that plays gap-less looping MP3 sounds.
+	 * An ISeionClip that plays gap-less looping MP3 sounds via specifying sample range.
 	 *
 	 * @see https://github.com/cardin/SeiON/wiki/Gapless-MP3-Looping
 	 */

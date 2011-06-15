@@ -5,6 +5,8 @@ package com.SeiON
     import flash.media.Sound;
     import flash.utils.ByteArray;
 
+	import com.SeiON.Core.SeionProperty;
+	
     /*
     // Pitch_Shift_MP3
     // Created by McFunkypants
@@ -18,9 +20,15 @@ package com.SeiON
     // Linkware: If you use this, kindly tweet/blog/post a link to it! =)
     */
 
-    public final class Pitch_Shift_MP3
+	/**
+	 * An ISeionClip that can adjust pitch, and change starting offset, truncation, by specifying
+	 * a byte range.
+	 */
+    public final class SeionBytes extends SeionClip
     {
+		// -- Special Constant --
         private const BLOCK_SIZE: int = 3072;
+		
 		
         private var _mp3: Sound;
         private var out: Sound;
@@ -31,17 +39,19 @@ package com.SeiON
         private var _skip_bytes_at_start:uint;
         private var _skip_bytes_at_end:uint;
 
-        public function Pitch_Shift_MP3(mp3:Sound, skip_bytes_at_start:uint=0, skip_bytes_at_end:uint=0)
+        public function SeionBytes(name:String, manager:SeionGroup, snd:Sound,
+								sndProperties:SeionProperty, autodispose:Boolean, secretKey:*)
         {
+			super(name, manager, sndTransform, sndProperties, autodispose, secretKey);
+			
             // to make it loop nicer you can ignore the first few and last few bytes
-            _skip_bytes_at_start = skip_bytes_at_start;
-            _skip_bytes_at_end = skip_bytes_at_end;
+            _skip_bytes_at_start = sndProperties.offset;
+            _skip_bytes_at_end = snd.bytesTotal - sndProperties.duration;
 			
             _target = new ByteArray();
             _position = 0.0;
             _rate = 0.0;
 			
-            _mp3 = mp3;
             out = new Sound();
             out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
             out.play();
@@ -65,7 +75,7 @@ package com.SeiON
             var positionTargetNum: Number = alpha;
             var positionTargetInt: int = -1;
             var need: int = Math.ceil( scaledBlockSize ) + 2;
-            var read: int = _mp3.extract( _target, need, positionInt );
+            var read: int = sound.extract( _target, need, positionInt );
             var n: int = read == need ? BLOCK_SIZE : read / _rate;
             var l0: Number;
             var r0: Number;
@@ -85,7 +95,7 @@ package com.SeiON
                 data.writeFloat( l0 + alpha * ( l1 - l0 ) );
                 data.writeFloat( r0 + alpha * ( r1 - r0 ) );
                 positionTargetNum += _rate;
-                if (_position > _mp3.bytesTotal - _skip_bytes_at_end)
+                if (_position > sound.bytesTotal - _skip_bytes_at_end)
                 {
                     _position = _skip_bytes_at_start;
                 }
