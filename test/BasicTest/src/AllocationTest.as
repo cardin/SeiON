@@ -41,7 +41,7 @@ package
 		
 		// Retrieved from http://ccmixter.org/files/hansatom/31743
 		// Licensed under Creative Commons Attribution Noncommercial (3.0)
-		[Embed(source = '../lib/hansatom_-_Inferno_is_a_place_on_earth.mp3')]
+		[Embed(source = '../lib/hansatom_-_Inferno_is_a_place_on_earth [edit].mp3')]
 		private var sndRock_cls:Class;
 		private var sndRock:Sound = new sndRock_cls() as Sound;
 		private var sndRock_SC:SeionClip;
@@ -49,7 +49,7 @@ package
 		
 		// Retrieved from http://ccmixter.org/files/unreal_dm/31740
 		// Licensed under Creative Commons Attribution Noncommercial (3.0)
-		[Embed(source='../lib/unreal_dm_-_Everything_I_Ever_Want.mp3')]
+		[Embed(source='../lib/unreal_dm_-_Everything_I_Ever_Want [edit].mp3')]
 		private var sndJazz2_cls:Class;
 		private var sndJazz2:Sound = new sndJazz2_cls() as Sound;
 		private var sndJazz2_SC:SeionClip;
