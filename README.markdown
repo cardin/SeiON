@@ -3,7 +3,7 @@
 ## What is SeiON?
 SeiON is an Actionscript 3 Sound Engine. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex.
 
-SeiON does the following: [[http://farm6.static.flickr.com/5025/5659905644_3c04efb727.jpg|float]]
+SeiON does the following:
 
 * Provides global control of all sounds played
 * Allows for pause/resume playback for sounds.
