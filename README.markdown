@@ -1,4 +1,4 @@
-![The SeiON Actionscript3 Sound Engine](http://img141.imageshack.us/img141/671/seionlogo.png)
+[[http://farm6.static.flickr.com/5025/5659905644_3c04efb727.jpg | align=center]]
 
 ## What is SeiON?
 SeiON is an Actionscript 3 Sound Engine. Its goal is to provide a simplistic, fuss-free way to manage sound playback within Flash/Flex.
@@ -15,18 +15,20 @@ As SeiON only accepts Sound() objects as input, it is most suitable for embedded
 ##Links
 
 * Visit the Wiki for Tutorials and stuff: <http://github.com/cardin/SeiON/wiki/>
-* Conventional Download Packages: <https://github.com/cardin/SeiON/downloads>
+* Conventional Download Packages: <http://github.com/cardin/SeiON/downloads>
 
 ##File Manifest
 
-	bin/ - The SeiON.swc file
-	lib/ - MP3 and Wave files embedded in the demo tests
 	src/ - The Actionscript source folder
-	test/ - Demo tests
 	LICENSE.txt - Project MIT License
 	README.markdown - This description file that you're reading
 	SeiON.as3proj - FlashDevelop project file
-
+	
+	test/ - Demo Applications
+	test/BasicTest/bin - Compiled demos
+	test/BasicTest/lib - Sound assets for demo
+	test/BasicTest/src - Demo source
+	test/BasicTest/src/Components - Demo helper components
 
 ##Licensed under the MIT License
 
