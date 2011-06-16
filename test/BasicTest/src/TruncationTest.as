@@ -6,7 +6,6 @@ package
 	import flash.media.Sound;
 	import flash.text.TextField;
 	
-	import com.SeiON.Core.SeionProperty;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
@@ -33,9 +32,9 @@ package
 		private var sndClip3:SeionClip;
 		
 		// 3 diff properties to be applied
-		private var sndProp1:SeionProperty = SeionProperty.makeClip("", 0, 0, 0);
-		private var sndProp2:SeionProperty = SeionProperty.makeClip("", 0, 0, 0);
-		private var sndProp3:SeionProperty = SeionProperty.makeClip("", 0, 0, 0);
+		private var offset1:uint, truncate1:uint;
+		private var offset2:uint, truncate2:uint;
+		private var offset3:uint, truncate3:uint;
 		
 		public function TruncationTest(container: DisplayObjectContainer)
 		{
@@ -53,7 +52,8 @@ package
 			
 			if (sc == null) //not created yet
 			{
-				this["sndClip" + choice] = sndGrp.createSound(snd, this["sndProp" + choice], false);
+				this["sndClip" + choice] = SeionClip.createExcerpt("", sndGrp, snd, 0, false, null,
+												this["offset" + choice], this["truncate" + choice]);
 				this["sndClip" + choice].play();
 			}
 			else //pause the existing sc
@@ -203,9 +203,8 @@ package
 		/** Updates the SeionProperties with the slider values. */
 		private function updateSndProp(choice:uint):void
 		{
-			this["sndProp" + choice].offset = this["slider" + choice].lRange * snd.length;
-			this["sndProp" + choice].duration = (this["slider" + choice].rRange -
-												this["slider" + choice].lRange) * snd.length;
+			this["offset" + choice] = this["slider" + choice].lRange * snd.length;
+			this["truncate" + choice] = (1 - this["slider" + choice].rRange) * snd.length;
 		}
 	}
 }

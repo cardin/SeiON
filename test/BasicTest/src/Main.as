@@ -5,7 +5,7 @@ package
 	
 	public class Main extends Sprite
 	{
-		private var test:AllocationTest;
+		private var test:TruncationTest;
 		
 		public function Main():void
 		{
@@ -17,7 +17,7 @@ package
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
-			test = new AllocationTest(this);
+			test = new TruncationTest(this);
 		}
 	}
 }
