@@ -236,7 +236,7 @@
 		 * Queries for additional allocation.
 		 * @return	True if allocation is possible.
 		 */
-		seion_ns function alloc(snd:ISeionInstance):Boolean
+		seion_ns function alloc(snd:ISeionInstance, autodispose:Boolean):Boolean
 		{
 			// Checking for dispose
 			if (isDisposed()) return false;
@@ -245,7 +245,7 @@
 			if (availAmt <= 0)
 			{
 				// beg clemency from Seion if it's autodisposable
-				if (snd.autodispose && Seion.allocation > 0)
+				if (autodispose && Seion.allocation > 0)
 				{
 					// We note down the loan from Seion
 					Seion.allocation--;
@@ -269,7 +269,7 @@
 			 */
 			
 			// Inserting the clip into its appropriate list
-			if (snd.autodispose)
+			if (autodispose)
 				autoList.push(snd);
 			else
 				list.push(snd);

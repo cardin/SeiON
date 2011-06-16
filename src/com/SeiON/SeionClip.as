@@ -119,7 +119,7 @@
 			 * Return the clip (if any).
 			 */
 			var a:SeionClip = new SeionClip(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a))
+			if (manager.seion_ns::alloc(a, autodispose))
 			{
 				SeionClip.init(a, name, manager, snd, repeat, autodispose, sndTransform, offset,
 								truncate);

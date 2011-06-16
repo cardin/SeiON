@@ -98,7 +98,7 @@ package com.SeiON
 			 * Return the clip (if any).
 			 */
 			var a:SeionSample = new SeionSample(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a))
+			if (manager.seion_ns::alloc(a, autodispose))
 			{
 				SeionSample.init(a, name, manager, snd, sampleDuration, repeat, autodispose, sndTransform);
 				if (autodispose)	a = null;
