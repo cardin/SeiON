@@ -8,12 +8,12 @@ package com.SeiON
 	 */
 	public interface ISeionInstance extends ISeionControl
 	{
-		/** Clears all references held. This object is now invalid. (ISeionInstance) */
-		function dispose():void;
-		
 		/** Is the SeionInstance already disposed of? (ISeionInstance)
 		 * @param	output	If true, a trace() message is given as well. */
-		function isDisposed(output:Boolean):Boolean;
+		function isDisposed(output:Boolean = true):Boolean;
+		
+		/** Clears all references held. This object is now invalid. (ISeionInstance) */
+		function dispose():void;
 		
 		/** Plays the sound from the beginning again. (ISeionInstance) */
 		function play():void;
@@ -21,7 +21,9 @@ package com.SeiON
 		/** Stops the sound and resets it to Zero. (ISeionInstance) */
 		function stop():void;
 		
-		// ----------------------------------- PROPERTIES -------------------------------
+		/*****************************************************************************
+		 * 									PROPERTIES
+		 *****************************************************************************/
 		
 		/** Is the sound active? (ISeionInstance) */
 		function get isPlaying():Boolean;
@@ -43,7 +45,7 @@ package com.SeiON
 		function get soundtransform():SoundTransform;
 		
 		/**
-		 * How many more times the SeionInstance has to repeat itself. <br />
+		 * How many times the SeionInstance is programmed to repeat itself. <br />
 		 * 0 means infinite repeats.<br />
 		 * -1 means no repeats.<p></p>
 		 *
@@ -51,6 +53,16 @@ package com.SeiON
 		 */
 		function get repeat():int;
 		function set repeat(value:int):void;
+		
+		/**
+		 * How many more times the SeionInstance has to repeat itself. To reset repeatLeft, set
+		 * repeat. <br />
+		 * 0 means infinite repeats.<br />
+		 * -1 means no repeats.<p></p>
+		 *
+		 * ISeionInstance
+		 */
+		function get repeatLeft():int;
 		
 		/** The total length of the clip, excluding repeats. In absolute terms. (ISeionInstance) */
 		function get length():Number;

@@ -1,5 +1,6 @@
 package com.SeiON
 {
+	import flash.errors.IllegalOperationError;
 	import flash.events.EventDispatcher;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
@@ -21,6 +22,8 @@ package com.SeiON
 		 * _volume, _pan:	The adjustable property of the sound. Different from the sndTransform
 		 * 					that's passed in the constructor
 		 * _repeat:		Times to repeat
+		 *
+		 * _initialRepeat:	The fixed repeat count of the sound
 		 * _sndTransform:	The fixed property of the sound
 		 *
 		 * _manager:	The SeionGroup that manages this SeionInstance
@@ -32,15 +35,21 @@ package com.SeiON
 		
 		private var _name:String;
 		private var _volume:Number = 1.0;
-		private var _pan:Number = 0;
-		private var _repeat:int;
+		private var _pan:Number = 0; /** @private */
+		protected var _repeat:int;
+		
+		private var _initialRepeat:int;
 		private var _sndTransform:SoundTransform;
 		
-		private var _manager:SeionGroup; /** @private */
+		/** @private */
+		protected var _manager:SeionGroup; /** @private */
 		protected var _snd:Sound;
 		protected var _sndChannel:SoundChannel;
 		private var _autodispose:Boolean;
 		private var _dispatcher:EventDispatcher;
+		
+		// A secret code passed in the constructor to ensure the constructor remains private.
+		protected static const _secretKey:Number = Math.random();
 		
 		/**
 		 * Do not instantiate. Use the respective SeionInstance.create() instead.
@@ -48,23 +57,40 @@ package com.SeiON
 		 * @throws	IllegalOperationError	When you try to directly instantiate ISeionInstance without
 		 * using SeionGroup.createSound().
 		 */
-		public function SeionInstance(name:String, manager:SeionGroup, snd:Sound, repeat:int,
-									autodispose:Boolean, sndTransform:SoundTransform, secretKey:*)
+		public function SeionInstance(secretKey:*)
 		{
-			if (secretKey != manager.killSound)
+			if (secretKey != _secretKey)
 				throw new IllegalOperationError("SeionInstance's constructor not allowed for direct "
 				+ "access! Please use SeionInstance.create() instead.");
-			
-			this._name = name;
-			this._manager = manager;
-			this._snd = snd;
-			this._repeat = repeat;
-			
-			this._autodispose = autodispose;
-			this._sndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
-			
-			_dispatcher = new EventDispatcher();
 		}
+		
+		/** The initialisation function. */
+		protected static function init(si:SeionInstance, name:String, manager:SeionGroup, snd:Sound,
+							repeat:int,	autodispose:Boolean, sndTransform:SoundTransform):void
+		{
+			if (manager == null || snd == null)
+				throw new ArgumentError("Arguments cannot be null!");
+			
+			if (sndTransform == null)
+				sndTransform = new SoundTransform();
+			
+			si._name = name;
+			si._manager = manager;
+			si._snd = snd;
+			si._repeat = repeat;
+			
+			si._autodispose = autodispose;
+			si._sndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
+			
+			si._dispatcher = new EventDispatcher();
+			
+			if (autodispose)
+				si.play();
+		}
+		
+		/***********************************************************************************
+		 * 									IMPLEMENTED FUNCTIONS
+		 ***********************************************************************************/
 		
 		/** Is the SeionInstance already disposed of? (ISeionInstance)
 		 * @param	output	If true, a trace() message is given as well. */
@@ -95,20 +121,30 @@ package com.SeiON
 		public function get soundtransform():SoundTransform	{	return _sndTransform;	}
 		
 		/**
-		 * How many more times the SeionInstance has to repeat itself. <br />
+		 *  How many times the SeionInstance is programmed to repeat itself. <br />
 		 * 0 means infinite repeats.<br />
 		 * -1 means no repeats.<p></p>
 		 *
 		 * ISeionInstance
 		 */
-		public function get repeat():int	{	return _repeat;	}
+		public function get repeat():int	{	return _initialRepeat;	}
 		public function set repeat(value:int):void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			_repeat = Math.max( -1, value);
+			_repeat = _initialRepeat = Math.max( -1, value);
 		}
+		
+		/**
+		 * How many more times the SeionInstance has to repeat itself. To reset repeatLeft, set
+		 * repeat. <br />
+		 * 0 means infinite repeats.<br />
+		 * -1 means no repeats.<p></p>
+		 *
+		 * ISeionInstance
+		 */
+		public function get repeatLeft():int	{	return _repeat;	}
 		
 		/**
 		 * Get: The volume as affected by its parent. <p></p>
@@ -133,7 +169,7 @@ package com.SeiON
 				
 				//assigning value back to soundChannel
 				var channelSndTransform:SoundTransform = _sndChannel.soundTransform;
-				channelSndTransform.vol = volValue;
+				channelSndTransform.volume = volValue;
 				_sndChannel.soundTransform = channelSndTransform;
 			}
 		}
@@ -172,7 +208,9 @@ package com.SeiON
 			}
 		}
 		
-		/* ----------------------------------- ABSTRACT ---------------------------------- */
+		/*****************************************************************************
+		 * 									ABSTRACT
+		 *****************************************************************************/
 		
 		public function dispose():void
 		{

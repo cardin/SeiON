@@ -4,7 +4,6 @@ package Components
 	import flash.events.MouseEvent;
 	import flash.media.Sound;
 	
-	import com.SeiON.Core.SeionProperty;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
 	
@@ -13,8 +12,6 @@ package Components
 	 */
 	public class xButton extends Button
 	{
-		private static const prop:SeionProperty = SeionProperty.makeClip("");
-		
 		private var snd:Sound;
 		private var sg:SeionGroup;
 		
@@ -33,7 +30,7 @@ package Components
 		{
 			super.rollHandler(e);
 			if (e.type == MouseEvent.ROLL_OVER)
-				sg.createSound("", snd, prop, true);
+				SeionClip.create("", sg, snd, -1, true);
 		}
 	}
 }

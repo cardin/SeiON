@@ -1,5 +1,6 @@
 ﻿package com.SeiON
 {
+	import com.SeiON.SeionGroup;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
@@ -7,6 +8,7 @@
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+	import com.SeiON.seion_ns;
 	import com.SeiON.Core.SeionEvent;
 	import com.SeiON.Misc.CountDown;
 	
@@ -24,16 +26,16 @@
 	{
 		/**
 		 * _offset:		The delayed starting position.
-		 * _truncate:	The shorted ending position.
+		 * _truncate:	The truncation from the ending position.
 		 *
 		 * pausedLocation:	Where the _snd was paused, so you can pause()/resume()
-		 * truncation:		Keeps track of where the _snd will end.
+		 * _truncation:		Keeps track of where the _snd will end.
 		 */
-		private var _offset:uint = 0;
-		private var _truncate:uint = 0;
+		private var _offset:uint;
+		private var _truncate:uint;
 		
 		private var pausedLocation:Number = -1;
-		public var truncation:CountDown;
+		private var _truncation:CountDown;
 		
 		/**
 		 * Please do not call this constructor directly; it will throw an error. Call it through
@@ -41,16 +43,45 @@
 		 *
 		 * @see SeionClip#create()
 		 */
-		public function SeionClip(name:String, manager:SeionGroup, snd:Sound, repeat:int,
-								sndTransform:SoundTransform, autodispose:Boolean, secretKey:*)
+		public function SeionClip(secretKey:*)
 		{
-			super(name, manager, snd, repeat, autodispose, sndTransform, secretKey);
+			super(secretKey);
 		}
 		
-		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int,
-					sndTransform:SoundTransform = null, autodispose:Boolean = true):SeionClip
+		/** The initialisation function. */
+		protected static function init(sc:SeionClip, name:String, manager:SeionGroup, snd:Sound,
+									repeat:int,	autodispose:Boolean, sndTransform:SoundTransform,
+									offset:uint, truncate:uint):void
 		{
-			///TODO complete SeionClip.create()
+			SeionInstance.init(sc, name, manager, snd, repeat, autodispose, sndTransform);
+			
+			sc._offset = offset;
+			sc._truncate = truncate;
+		}
+		
+		/**
+		 * Creates a sound clip.
+		 * @param	name	Any name, even a non-unique one.
+		 * @param	manager	The SeionGroup that manages this SeionClip. Immutable.
+		 * @param	snd 	The sound data. Immutable.
+		 * @param	repeat	How many times to repeat the clip.
+		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
+		 * @param	sndTransform	The fixed internal property for the sound.
+		 *
+		 * @return	A SeionClip is allocation was successful. Null if allocation failed, or
+		 * autodispose is true.
+		 *
+		 * @see	#name
+		 * @see	#repeat
+		 * @see	#soundtransform
+		 * @see	#autodispose
+		 */
+		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int,
+					autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionClip
+		{
+			var a:SeionClip = createExcerpt(name, manager, snd, repeat, autodispose, sndTransform,
+											0, 0);
+			return a;
 		}
 		
 		/**
@@ -59,66 +90,90 @@
 		 * @param	manager	The SeionGroup that manages this SeionClip. Immutable.
 		 * @param	snd 	The sound data. Immutable.
 		 * @param	repeat	How many times to repeat the clip.
-		 * @param	sndTransform	The fixed internal property for the sound.
 		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
-		 * @param	offset		The delayed starting position. Immutable.
-		 * @param	truncate	The shorted ending position. Immutable.
+		 * @param	sndTransform	The fixed internal property for the sound.
+		 * @param	offset		The delayed starting position. In Milliseconds. Immutable.
+		 * @param	truncate	The truncation from the ending position. In Milliseconds. Immutable.
 		 *
-		 * @return	A SeionClip is allocation was successful. Null if allocation failed, or
+		 * @return	A SeionClip if allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
+		 *
+		 * @see	#name
+		 * @see	#repeat
+		 * @see	#soundtransform
+		 * @see	#autodispose
+		 * @see	#offset
+		 * @see	#truncate
 		 */
 		public static function createExcerpt(name:String, manager:SeionGroup, snd:Sound, repeat:int,
-					sndTransform:SoundTransform, autodispose:Boolean,
-					offset:Number, truncate:Number):SeionClip
+						autodispose:Boolean, sndTransform:SoundTransform,
+						offset:uint, truncate:uint):SeionClip
 		{
-			var a:SeionClip = create(name, manager, snd, repeat, sndTransform, autodispose);
-			if (a != null)
+			/**
+			 * Create empty hull of a SeionClip.
+			 * Try to allocate the sound in manager.
+			 * If successful
+			 * 		Initiate the SeionClip
+			 * 		Check if it's autodisposable
+			 *
+			 * Return the clip (if any).
+			 */
+			var a:SeionClip = new SeionClip(SeionInstance._secretKey);
+			if (manager.seion_ns::alloc(a))
 			{
-				a._offset = offset;
-				a._truncate = truncate;
+				SeionClip.init(a, name, manager, snd, repeat, autodispose, sndTransform, offset,
+								truncate);
+				if (autodispose)	a = null;
 			}
+			else
+				a = null;
+			
 			return a;
 		}
 		
+		// --------------------------------------- Abstract ---------------------------------
+		
 		/** Clears all references held. This object is now invalid. (ISeionInstance) */
-		public function dispose():void
+		override public function dispose():void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
 			
 			stop();
 			
-			// truncation.stop() alrdy done in dispose's stop() above
-			truncation = null;
+			// _truncation.stop() alrdy done in dispose's stop() above
+			_truncation = null;
 			
-			_manager.killSound(this);
+			_manager.seion_ns::killSound(this);
 			super.dispose();
 		}
 		
-		// ---------------------------------- PLAYBACK CONTROLS ----------------------------
+		/*******************************************************************************
+		 * 									PLAYBACK CONTROLS
+		 *******************************************************************************/
+		//  ----------------------------------- Abstract -------------------------------
 		
-		/** Plays the _snd from the beginning again according to sndProperties. (ISeionInstance) */
-		public function play():void
+		/** Plays the sound from the beginning again. (ISeionInstance) */
+		override public function play():void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
 			
 			stop(); // for safety's sake
 			
-			// setting up truncation
+			// setting up _truncation
 			// CountDown does not operate if given input = 0
-			var truncatedLength:Number = (sndProperties.duration == 0) ? 0 : sndProperties.duration;
-			truncation = new CountDown(truncatedLength);
-			truncation.start();
-			truncation.pause(); //<-- start&pause cos we using resume() later
-			truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
+			_truncation = new CountDown(this.length);
+			_truncation.start();
+			_truncation.pause(); //<-- start&pause cos we using resume() later
+			_truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
 			
-			pausedLocation = sndProperties.offset;
+			pausedLocation = _offset;
 			resume();
 		}
 		
-		/** Stops the _snd and resets it to Zero. (ISeionInstance) */
-		public function stop():void
+		/** Stops the sound and resets it to Zero. (ISeionInstance) */
+		override public function stop():void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
@@ -132,19 +187,19 @@
 					_sndChannel = null;
 				}
 				// reset variables
-				if (truncation) // 'cos play() calls stop() before truncation is even created
+				if (_truncation) // 'cos play() calls stop() before _truncation is even created
 				{
-					truncation.stop();
-					truncation.removeEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
+					_truncation.stop();
+					_truncation.removeEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
 				}
 				
 				pausedLocation = -1;
-				_repeat = sndProperties.repeat;
+				repeat = repeat;
 			}
 		}
 		
-		/** Resumes playback of _snd. (ISeionControl) */
-		public function resume():void
+		/** Resumes playback of sound. (ISeionControl) */
+		override public function resume():void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
@@ -155,15 +210,15 @@
 			// resume is only valid if it were paused in the 1st place
 			if (isPaused)
 			{
-				// setting volume and panning - triggering properties to set for us
-				volume = _volume;
-				pan = _pan;
-				
-				// resuming truncation
-				truncation.resume();
+				// resuming _truncation
+				_truncation.resume();
 				
 				// starting up the _snd
-				_sndChannel = _snd.play(pausedLocation, 0, sndTransform);
+				_sndChannel = _snd.play(pausedLocation, 0, soundtransform);
+				
+				// setting volume and panning - triggering properties to set for us
+				volume = volume;
+				pan = pan;
 				
 				/* The _snd might be so short that it finishes before the code executes.
 				 * Just in case.
@@ -178,8 +233,8 @@
 			}
 		}
 		
-		/** Pauses playback of _snd. (ISeionControl) */
-		public function pause():void
+		/** Pauses playback of sound. (ISeionControl) */
+		override public function pause():void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
@@ -192,13 +247,23 @@
 				_sndChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 				_sndChannel = null;
 				
-				truncation.pause();
+				_truncation.pause();
 			}
 		}
 		
-		// ----------------------------------- PROPERTIES ---------------------------------
+		/*****************************************************************************
+		 * 									PROPERTIES
+		 *****************************************************************************/
+		
+		/** The delayed starting position. In Milliseconds. */
+		public function get offset():uint	{	return _offset;	}
+		/** The truncation from the ending position. In Milliseconds. */
+		public function get truncate():uint	{	return _truncate;	}
+		
+		// --------------------------------- ABSTRACT --------------------------------
+		
 		/** Is the sound active? (ISeionInstance) */
-		public function get isPlaying():Boolean
+		override public function get isPlaying():Boolean
 		{
 			if (_sndChannel)
 				return true;
@@ -206,7 +271,7 @@
 		}
 		
 		/** Is the playback paused? (ISeionControl) */
-		public function get isPaused():Boolean
+		override public function get isPaused():Boolean
 		{
 			if (pausedLocation == -1)
 				return false;
@@ -214,42 +279,46 @@
 		}
 		
 		/** The total length of the clip, excluding repeats. In Milliseconds. (ISeionInstance) */
-		public function get length():Number
+		override public function get length():Number
 		{
 			// Checking for dispose
 			if (isDisposed())	return 0.0;
-			
-			return (sndProperties.duration == 0) ? _snd.length : sndProperties.duration;
+			return _snd.length - _truncate - _offset;
 		}
 		
 		/** How far into the clip we are. In Milliseconds. (ISeionInstance) <p></p>
+		 *
 		 * Includes offsets or truncated durations, eg. a 10 second _snd with 5 seconds offset at
 		 * starting position would report a position of 0, not 5. */
-		public function get position():Number
+		override public function get position():Number
 		{
 			// Checking for dispose
 			if (isDisposed())	return 0.0;
 			
 			if (isPaused)
-				return pausedLocation - sndProperties.offset;
+				return pausedLocation - _offset;
 			else if (!isPlaying) //clip not started yet
 				return 0;
-			return _sndChannel.position - sndProperties.offset;
+			return _sndChannel.position - _offset;
 		}
 		
 		/** How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>
+		 *
 		 * Includes offsets or truncations, eg. a 100 second _snd with 5 seconds offset at
 		 * starting position would report a position of 0.0, not 0.95. */
-		public function get progress():Number
+		override public function get progress():Number
 		{
 			return position / length;
 		}
 		
-		// -------------------------------- PRIVATE HELPER METHODS --------------------------
+		/***********************************************************************************
+		 *	 								PRIVATE HELPER METHODS
+		 ***********************************************************************************/
+		
 		/**
 		 * Called when a _snd completes. As for autodispose _snds, they self-dispose.
 		 *
-		 * @param	e	Not important. e == null when truncation cuts it short, else this function
+		 * @param	e	Not important. e == null when _truncation cuts it short, else this function
 		 * 				was called by Event.SOUND_COMPLETE.
 		 *
 		 * @private
@@ -258,12 +327,12 @@
 		{
 			if (e)		e.stopImmediatePropagation();
 			
-			if (repeat >= 0) // repeating
+			if (repeatLeft >= 0) // repeating
 			{
-				if (repeat == 0) // infinite loop
+				if (repeatLeft == 0) // infinite loop
 				{}
-				else if (repeat == 1) // the last time
-					repeat = -1;
+				else if (repeatLeft == 1) // the last time
+					_repeat = -1;
 				
 				repeatSound();
 				dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
@@ -284,7 +353,7 @@
 		private function repeatSound():void
 		{
 			// 'cos variables are lost in play() and play()'s stop(), we record them
-			var tmpRepeat:int = _repeat;
+			var tmpRepeat:int = repeatLeft; //TODO fix this hack; not supposed to expose _repeat!
 			play();
 			_repeat = tmpRepeat;
 		}

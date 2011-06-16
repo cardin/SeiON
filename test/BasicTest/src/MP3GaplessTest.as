@@ -10,7 +10,6 @@ package
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	
-	import com.SeiON.Core.SeionProperty;
 	import com.SeiON.ISeionInstance;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
@@ -35,17 +34,11 @@ package
 		 * testGrp: A SeionGroup so that we can call its factory method for creating a SeionClip.
 		 * sndClip: The SeionClip containing the Sound that we want to play.
 		 *
-		 * gap_prop: The SeionProperty for playing a typical sound (aka SeionClip).
-		 * gapless_prop: The SeionProperty for playing gapless MP3 (aka SeionSample).
-		 *
 		 * _playStatus: 0 = not playing, 1 = paused, 2 = playing
 		 * _mode: 0 = with gap, 1 = gapless
 		 */
 		private var testGrp:SeionGroup;
 		private var sndClip:ISeionInstance;
-		
-		private var gap_prop:SeionProperty = SeionProperty.makeClip("", 0);
-		private var gapless_prop:SeionProperty = SeionProperty.makeMP3Gapless("", 124510);
 		
 		private var _playStatus:uint = 0;
 		private var _mode:uint = 0;
@@ -71,9 +64,9 @@ package
 			stopTest();
 			
 			if (mode == 0) // gap
-				sndClip = testGrp.createSound(snd, gap_prop, false);
+				sndClip = SeionClip.create("", testGrp, snd, -1, false);
 			else //gapless
-				sndClip = testGrp.createSound(snd, gapless_prop, false);
+				sndClip = SeionSample.createGaplessMP3("", testGrp, snd, 124510, false);
 			
 			sndClip.play();
 			
@@ -125,9 +118,9 @@ package
 				startTest();
 		}
 		
-		//-------------------------------------------------------------------------------
-		//------------------------------- RENDERING STUFF -------------------------------
-		//-------------------------------------------------------------------------------
+		/********************************************************************************
+		 * 									RENDERING STUFF
+		 ********************************************************************************/
 		
 		private var play_but: Button;
 		private var stop_but: Button;

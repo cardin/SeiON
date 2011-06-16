@@ -10,12 +10,12 @@ package
 	import flash.text.TextFieldAutoSize;
 	
 	import com.SeiON.Core.SeionEvent;
-	import com.SeiON.Core.SeionProperty;
 	import com.SeiON.ISeionInstance;
 	import com.SeiON.ISeionControl;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
+	import com.SeiON.SeionSample;
 	
 	import Components.PanningBar;
 	import Components.ProgressBar;
@@ -30,14 +30,12 @@ package
 		/*********************************************
 		 * Embedding the sounds and sound properties
 		 *********************************************/
-		private var sndProp:SeionProperty = SeionProperty.makeClip("");
 		
 		// Retrieved from http://www.jazzhouseblues.com/
 		[Embed(source = '../lib/Muffin Man Swing.mp3')]
 		private var sndJazz_cls:Class;
 		private var sndJazz:Sound = new sndJazz_cls() as Sound;
 		private var sndJazz_SC:SeionClip;
-		private var sndJazz_prop:SeionProperty = sndProp;
 		
 		// Retrieved from http://ccmixter.org/files/hansatom/31743
 		// Licensed under Creative Commons Attribution Noncommercial (3.0)
@@ -45,7 +43,6 @@ package
 		private var sndRock_cls:Class;
 		private var sndRock:Sound = new sndRock_cls() as Sound;
 		private var sndRock_SC:SeionClip;
-		private var sndRock_prop:SeionProperty = sndProp;
 		
 		// Retrieved from http://ccmixter.org/files/unreal_dm/31740
 		// Licensed under Creative Commons Attribution Noncommercial (3.0)
@@ -53,24 +50,20 @@ package
 		private var sndJazz2_cls:Class;
 		private var sndJazz2:Sound = new sndJazz2_cls() as Sound;
 		private var sndJazz2_SC:SeionClip;
-		private var sndJazz2_prop:SeionProperty = sndProp;
 		
 		// Retrieved from http://soundcloud.com/andremichelle/void-panic
 		[Embed(source = '../lib/void panic.mp3')]
 		private var sndLoop_cls:Class;
 		private var sndLoop:Sound = new sndLoop_cls() as Sound;
 		private var sndLoop_SC:SeionClip;
-		private var sndLoop_prop:SeionProperty = SeionProperty.makeMP3Gapless("", 124510);
 		
 		[Embed(source = '../lib/snd_ring.mp3')]
 		private var sndRing_cls:Class;
 		private var sndRing:Sound = new sndRing_cls() as Sound;
-		private var sndRing_prop:SeionProperty = SeionProperty.makeClip("");
 		
 		[Embed(source='../lib/snd_rollover.mp3')]
 		private var sndRoll_cls:Class;
 		private var sndRoll:Sound = new sndRoll_cls() as Sound;
-		private var sndRoll_prop:SeionProperty = sndProp;
 		
 		/*************************************************
 		 * The categories under which the sounds will be played
@@ -97,22 +90,29 @@ package
 		 */
 		private function startSnd(name:String, sg:SeionGroup):void
 		{
-			if (name != "sndRing") // for sndRing, it's triggered in the enterFrame directly
+			if (this[name + "_SC"] == null) //sound not yet created
 			{
-				if (this[name + "_SC"] == null) //sound not yet created
+				switch (name)
 				{
-					this[name + "_SC"] = sg.createSound(name, this[name], this[name + "_prop"], false);
-					if (this[name + "_SC"] != null) // if null, tt means we weren't able to create
-					{
-						ISeionInstance(this[name + "_SC"]).dispatcher.addEventListener(Event.SOUND_COMPLETE, onComplete);
-						ISeionInstance(this[name + "_SC"]).play();
-					}
+					case "sndLoop":
+						sndLoop_SC = SeionSample.createGaplessMP3(name, sg, sndLoop, 124510, 0, false);
+						break;
+					default:
+						this[name + "_SC"] = SeionClip.create(name, sg, this[name], -1, false);
+						break;
 				}
-				else //pause the sound
+				
+				// if null, tt means we weren't able to create
+				if (this[name + "_SC"] != null)
 				{
-					if (this[name + "_SC"].isPlaying)	ISeionInstance(this[name + "_SC"]).pause();
-					else								ISeionInstance(this[name + "_SC"]).resume();
+					ISeionInstance(this[name + "_SC"]).dispatcher.addEventListener(Event.SOUND_COMPLETE, onComplete);
+					ISeionInstance(this[name + "_SC"]).play();
 				}
+			}
+			else //pause the sound
+			{
+				if (this[name + "_SC"].isPlaying)	ISeionInstance(this[name + "_SC"]).pause();
+				else								ISeionInstance(this[name + "_SC"]).resume();
 			}
 		}
 		
@@ -455,7 +455,7 @@ package
 				// --------------------------------- Spamming Ringing Sounds
 				// 1 autodispose ring per enterFrame
 				if (triggerRing)
-					sgRing.createSound("", sndRing, sndRing_prop, true);
+					SeionClip.create("", sgRing, sndRing, -1, true);
 		}
 		
 		/** Responds to button presses */

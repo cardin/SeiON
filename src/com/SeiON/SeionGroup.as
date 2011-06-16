@@ -6,6 +6,7 @@
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+	import com.SeiON.seion_ns;
 	import com.SeiON.ISeionInstance;
 	import com.SeiON.Core.SeionProperty;
 	
@@ -80,7 +81,7 @@
 		public function dispose():void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			while (list.length > 0)
 				list.pop().dispose();
@@ -100,7 +101,7 @@
 		public function resume():void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			// If Seion is paused, we do not resume
 			if (Seion._this.isPaused)	return;
@@ -121,7 +122,7 @@
 		public function pause():void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			if (!isPaused)
 			{
@@ -150,7 +151,7 @@
 		public function set volume(value:Number):void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			_volume = value;
 			var sc:ISeionInstance;
@@ -175,7 +176,7 @@
 		public function set pan(value:Number):void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			_pan = value;
 			var sc:ISeionInstance;
@@ -197,60 +198,13 @@
 		// ---------------------------- SOUND CREATION & DESTRUCTION -------------------------
 		
 		/**
-		 * Creates a sound for playback.
-		 *
-		 * @param	name	A non-unique name for the sound.
-		 * @param	snd The Sound object from which it'll be created from.
-		 * @param	sndProperties	Unique properties to be applied to the sound.
-		 * @param	autodispose	Autodisposable sounds have low priority and are the 1st to be
-		 * overwritten when allocation is limited. They are self-disposable too.
-		 *
-		 * @return	null, if: <ol>
-		 * <li>No allocation is available.</li>
-		 * <li>You created an autodispose sound.</li></ol>
-		 * Else, it will return a handle to the ISeionInstance you created.
-		 */
-		public function createSound(name:String, snd:Sound, sndProperties:SeionProperty,
-									autodispose:Boolean = true):ISeionInstance
-		{
-			// Checking for dispose
-			if (isDisposed()) return false;
-			
-			if (snd == null || sndProperties == null)
-				throw new ArgumentError("Arguments cannot be null!");
-			
-			var sc:ISeionInstance;
-			if (sndProperties.isMilliseconds)
-				sc = new SeionClip(name, this, snd, sndProperties, autodispose, killSound);
-			else
-				sc = new SeionSample(name, this, snd, sndProperties, autodispose, killSound);
-			
-			if (this.alloc(sc))
-			{
-				if (autodispose)
-				{
-					sc.play();
-					sc = null;
-				}
-			}
-			else
-			{
-				// Allocation failed. Dispose of this clip.
-				sc.dispose();
-				sc = null;
-			}
-			
-			return sc;
-		}
-		
-		/**
 		 * Kills all AUTO-DISPOSABLE sounds of this SeionGroup. Useful when you want to "clean the
 		 * slate".
 		 */
 		public function killAllAutoSounds():void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			// topping up the amounts
 			availAmt += autoList.length - borrowedAmt;
@@ -268,7 +222,7 @@
 		public function killAllSounds():void
 		{
 			// Checking for dispose
-			if (isDisposed()) return false;
+			if (isDisposed()) return;
 			
 			killAllAutoSounds();
 			availAmt = fullAlloc;
@@ -279,45 +233,10 @@
 		}
 		
 		/**
-		 * Removes the sound from list. This is usually called from within ISeionInstance.dispose().
-		 * @param	sc		If sc does not exist in this SeionGroup, nothing happens.
-		 *
-		 * @private
-		 */
-		internal function killSound(sc:ISeionInstance = null):void
-		{
-			/* If null, it means Seion called this method. It wants to kill an autodisposable
-			 * sound, in the hopes that enough allocation is freed to generate another SeionGroup.
-			 */
-			if (sc == null)
-			{
-				if (borrowedAmt <= 0)	return;
-				sc = autoList[0];
-			}
-			
-			// proceeding to destroy the ISeionInstance
-			if (autoList.indexOf(sc) > -1)
-				autoList.splice(autoList.indexOf(sc), 1);
-			else if (list.indexOf(sc) > -1)
-				list.splice(list.indexOf(sc), 1);
-			else
-				return;
-			
-			// If sound is autodisposable, and if we are indebted to Seion, then return it.
-			if (sc.autodispose && borrowedAmt > 0)
-			{
-				Seion.allocation++;
-				borrowedAmt--;
-			}
-			else
-				availAmt ++;
-		}
-		
-		/**
 		 * Queries for additional allocation.
 		 * @return	True if allocation is possible.
 		 */
-		private function alloc(snd:ISeionInstance):Boolean
+		seion_ns function alloc(snd:ISeionInstance):Boolean
 		{
 			// Checking for dispose
 			if (isDisposed()) return false;
@@ -359,6 +278,41 @@
 		}
 		
 		/**
+		 * Removes the sound from list. This is usually called from within ISeionInstance.dispose().
+		 * @param	sc		If sc does not exist in this SeionGroup, nothing happens.
+		 *
+		 * @private
+		 */
+		seion_ns function killSound(sc:ISeionInstance = null):void
+		{
+			/* If null, it means Seion called this method. It wants to kill an autodisposable
+			 * sound, in the hopes that enough allocation is freed to generate another SeionGroup.
+			 */
+			if (sc == null)
+			{
+				if (borrowedAmt <= 0)	return;
+				sc = autoList[0];
+			}
+			
+			// proceeding to destroy the ISeionInstance
+			if (autoList.indexOf(sc) > -1)
+				autoList.splice(autoList.indexOf(sc), 1);
+			else if (list.indexOf(sc) > -1)
+				list.splice(list.indexOf(sc), 1);
+			else
+				return;
+			
+			// If sound is autodisposable, and if we are indebted to Seion, then return it.
+			if (sc.autodispose && borrowedAmt > 0)
+			{
+				Seion.allocation++;
+				borrowedAmt--;
+			}
+			else
+				availAmt ++;
+		}
+		
+		/**
 		 * Returns an array of all ISeionInstances' details.
 		 * name:		name of the sound class
 		 * ad:			Auto diposable?
@@ -383,7 +337,7 @@
 				stat.name = sc.name;
 				stat.ad = sc.autodispose;
 				stat.playing = sc.isPlaying;
-				stat.propname = sc.soundproperty.name;
+				stat.propname = sc.name;
 				
 				arr.push(stat);
 			}
@@ -393,7 +347,7 @@
 				stat.name = sc.name;
 				stat.ad = sc.autodispose;
 				stat.playing = sc.isPlaying;
-				stat.propname = sc.soundproperty.name;
+				stat.propname = sc.name;
 				
 				arr.push(stat);
 			}
