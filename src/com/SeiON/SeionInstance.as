@@ -216,11 +216,6 @@ package com.SeiON
 			amtToMove = (desiredDir - panValue) * Math.abs(_manager.pan);
 			_sndTransform.pan = amtToMove + panValue;
 			
-			trace("input: " + _pan);
-			trace("before manager :" + panValue);
-			trace("manager: " + _manager.pan);
-			trace("final: " + _sndTransform.pan);
-			
 			//assigning value back to soundChannel
 			if (isPlaying)
 				_sndChannel.soundTransform = _sndTransform;

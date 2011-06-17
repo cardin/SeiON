@@ -329,11 +329,13 @@
 			}
 			else // disposing
 			{
-				stop();
-				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
-				
 				if (autodispose)
 					dispose();
+				else
+				{
+					stop();
+					dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
+				}
 			}
 		}
 		
