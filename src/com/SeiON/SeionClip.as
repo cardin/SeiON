@@ -325,11 +325,11 @@
 					_repeat = -1;
 				
 				repeatSound();
-				dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
+				dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
 			}
 			else // disposing
 			{
-				dispatcher.dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
+				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
 				
 				if (autodispose)

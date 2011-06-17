@@ -47,7 +47,7 @@ package com.SeiON
 		private var _latency:Number = 0;
 		
 		/** -- Playback Variables --
-		 * _paused: The sound is paused.
+		 * _paused: Whether the sound is paused.
 		 */
 		private var _paused:Boolean = false;
 		
@@ -61,10 +61,10 @@ package com.SeiON
 										sampleDuration:int, repeat:int,
 										autodispose:Boolean, sndTransform:SoundTransform):void
 		{
-			SeionInstance.init(ss, name, manager, snd, repeat, autodispose, sndTransform);
 			ss._out = new Sound();
-			
 			ss._samplesTotal = sampleDuration;
+			
+			SeionInstance.init(ss, name, manager, snd, repeat, autodispose, sndTransform);
 		}
 		
 		/**
@@ -111,8 +111,14 @@ package com.SeiON
 		/** Clears all references held. This object is now invalid. (ISeionInstance) */
 		override public function dispose():void
 		{
-			super.dispose();
+			// Checking for dispose
+			if (isDisposed())	return;
+			
+			stop();
 			_out = null;
+			
+			_manager.seion_ns::killSound(this);
+			super.dispose();
 		}
 		
 		/** Plays the sound from the beginning again according to sndProperties. (ISeionInstance) */
@@ -279,8 +285,8 @@ package com.SeiON
 					// Check repeat status
 					if (onSoundComplete())
 						_samplePosition = 0; // Wrap
-					else // Finish repeating, END
-						return;
+					else
+						return; // Finish repeating, END
 				}
 			}
 		}
@@ -298,12 +304,12 @@ package com.SeiON
 				else if (repeatLeft == 1) // the last time
 					_repeat = -1;
 				
-				dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
+				dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
 				return false;
 			}
 			else // no more repeats
 			{
-				dispatcher.dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
+				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
 				if (autodispose)
 					dispose();

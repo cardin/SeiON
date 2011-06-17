@@ -105,7 +105,7 @@ package
 				// if null, tt means we weren't able to create
 				if (this[name + "_SC"] != null)
 				{
-					ISeionInstance(this[name + "_SC"]).dispatcher.addEventListener(Event.SOUND_COMPLETE, onComplete);
+					ISeionInstance(this[name + "_SC"]).addEventListener(Event.SOUND_COMPLETE, onComplete);
 					ISeionInstance(this[name + "_SC"]).play();
 				}
 			}
@@ -124,7 +124,7 @@ package
 			if (this[name + "_SC"] != null)
 			{
 				ISeionInstance(this[name + "_SC"]).stop();
-				ISeionInstance(this[name + "_SC"]).dispatcher.removeEventListener(Event.SOUND_COMPLETE, onComplete);
+				ISeionInstance(this[name + "_SC"]).removeEventListener(Event.SOUND_COMPLETE, onComplete);
 				ISeionInstance(this[name + "_SC"]).dispose();
 				this[name + "_SC"] = null;
 			}

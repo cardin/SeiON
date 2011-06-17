@@ -1,6 +1,7 @@
 package com.SeiON
 {
 	import flash.errors.IllegalOperationError;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
@@ -8,6 +9,10 @@ package com.SeiON
 	
 	import com.SeiON.SeionGroup;
 	
+	/** Defines the value when a SeionInstance finishes playback and does not repeat. */
+	[Event(name = "soundComplete", type = "flash.events.Event")]
+	/** Defines the value when a SeionInstance loops itself. */
+	[Event(name = "soundRepeat", type = "com.SeiON.Core.SeionEvent")]
 	/**
 	 * The base class that all sound-playing Seion classes must inherit. Treat this like an Abstract
 	 * class. Cannot be instantiated. Instead, use the respective subclasses' SeionInstance.create().
@@ -32,7 +37,7 @@ package com.SeiON
 		 * _snd:		The native Flash Sound() object
 		 * _sndChannel:		SoundChannel created when Sound.play() is called
 		 * _autodispose:	Whether this object will be automatically marked for GC
-		 * _dispatcher:		The place to listen for events from SeionClip
+		 * _dispatcher:		Wrapper over EventDispatcher to support this obj's IEventDispatcher
 		 */
 		
 		private var _name:String;
@@ -89,7 +94,7 @@ package com.SeiON
 			si._sndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
 			si._fixedSndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
 			
-			si._dispatcher = new EventDispatcher();
+			si._dispatcher = new EventDispatcher(si);
 			
 			// pre-setting
 			si.volume = 1;
@@ -100,7 +105,7 @@ package com.SeiON
 		}
 		
 		/***********************************************************************************
-		 * 									IMPLEMENTED FUNCTIONS
+		 * 									IMPLEMENTED INTERFACE
 		 ***********************************************************************************/
 		
 		/** Is the SeionInstance already disposed of? (ISeionInstance)
@@ -115,6 +120,15 @@ package com.SeiON
 			return false;
 		}
 		
+		// ----------------------------------- IEventDispatcher -----------------------------
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void {	_dispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);	}
+		public function dispatchEvent(event:Event):Boolean	{	return _dispatcher.dispatchEvent(event); }
+		public function hasEventListener(type:String):Boolean	{	return _dispatcher.hasEventListener(type);	}
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void	{	_dispatcher.removeEventListener(type, listener, useCapture);	}
+		public function willTrigger(type:String):Boolean	{	return _dispatcher.willTrigger(type);	}
+		
+		// -------------------------------------- PROPERTIES --------------------------------
+		
 		/** The name of the clip, non-unique. (ISeionInstance) */
 		public function get name():String {		return _name;	}
 		public function set name(value:String):void	{	_name = value;	}
@@ -124,9 +138,6 @@ package com.SeiON
 		
 		/** Whether this sound is auto-disposable. (ISeionInstance) */
 		public function get autodispose():Boolean	{	return _autodispose;	}
-		
-		/** Fires off Event.SOUND_COMPLETE and/or SeionEvent.SOUND_REPEAT. (ISeionInstance) */
-		public function get dispatcher():EventDispatcher	{	return _dispatcher;	}
 		
 		/** Returns the predefined sound properties of the sound. (ISeionInstance) */
 		public function get soundtransform():SoundTransform	{	return _fixedSndTransform;	}
@@ -216,8 +227,6 @@ package com.SeiON
 		
 		public function dispose():void
 		{
-			isDisposed();
-			
 			_fixedSndTransform = null;
 			_manager = null;
 			_snd = null;

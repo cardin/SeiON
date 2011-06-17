@@ -1,12 +1,13 @@
 package com.SeiON
 {
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher
 	import flash.media.SoundTransform;
 	
 	/**
 	 * Additional playback features for SeionInstance and its derivatives.
 	 */
-	public interface ISeionInstance extends ISeionControl
+	public interface ISeionInstance extends ISeionControl, IEventDispatcher
 	{
 		/** Is the SeionInstance already disposed of? (ISeionInstance)
 		 * @param	output	If true, a trace() message is given as well. */
@@ -37,9 +38,6 @@ package com.SeiON
 		
 		/** Whether this sound is auto-disposable. (ISeionInstance) */
 		function get autodispose():Boolean;
-		
-		/** Fires off Event.SOUND_COMPLETE and/or SeionClip.SOUND_REPEAT. (ISeionInstance) */
-		function get dispatcher():EventDispatcher;
 		
 		/** Returns the predefined sound properties of the sound. (ISeionInstance) */
 		function get soundtransform():SoundTransform;

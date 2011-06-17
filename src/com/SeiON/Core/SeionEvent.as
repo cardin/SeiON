@@ -9,8 +9,8 @@ package com.SeiON.Core
 	 */
 	public class SeionEvent extends Event
 	{
-		/** Fired by ISeionInstance.dispatcher when ISeionInstance restarts() */
-		public static const SOUND_REPEAT:String = "SeionEvent.SOUND_REPEAT";
+		/** Defines the value for when a SeionInstance loops playback. */
+		public static const SOUND_REPEAT:String = "soundRepeat";
 		
 		private var _targetSndObj:ISeionInstance;
 		
