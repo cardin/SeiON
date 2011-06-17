@@ -29,7 +29,7 @@ package com.SeiON
 	 *
 	 * @see https://github.com/cardin/SeiON/wiki/Gapless-MP3-Looping
 	 */
-	public final class SeionSample extends SeionClip
+	public final class SeionSample extends SeionInstance
 	{
 		// -- Special Constants --
 		private const MAGIC_DELAY:Number = 2257.0; // LAME 3.98.2 + flash.media.Sound Delay
@@ -38,12 +38,12 @@ package com.SeiON
 		/** -- Sampling Variables --
 		 * _out: Use for output stream
 		 * _samplesTotal: The final position of sampling.
-		 * _samplesPosition: The read-head position.
+		 * _samplePosition: The read-head position.
 		 * _latency: Latency of playback.
 		 */
 		private var _out:Sound;
 		private var _samplesTotal:uint = 0;
-		private var _samplesPosition:int = 0;
+		private var _samplePosition:int = 0;
 		private var _latency:Number = 0;
 		
 		/** -- Playback Variables --
@@ -54,17 +54,14 @@ package com.SeiON
 		/**.
 		 * @inheritDoc
 		 */
-		public function SeionSample(secretKey:*)
-		{
-			super(secretKey);
-		}
+		public function SeionSample(secretKey:*) {	super(secretKey);	}
 		
 		/** The initialisation function. */
 		protected static function init(ss:SeionSample, name:String, manager:SeionGroup, snd:Sound,
 										sampleDuration:int, repeat:int,
 										autodispose:Boolean, sndTransform:SoundTransform):void
 		{
-			SeionClip.init(ss, name, manager, snd, repeat, autodispose, sndTransform, 0, 0);
+			SeionInstance.init(ss, name, manager, snd, repeat, autodispose, sndTransform);
 			ss._out = new Sound();
 			
 			ss._samplesTotal = sampleDuration;
@@ -89,10 +86,10 @@ package com.SeiON
 						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionSample
 		{
 			/**
-			 * Create empty hull of a SeionClip.
+			 * Create empty hull of a SeionSample.
 			 * Try to allocate the sound in manager.
 			 * If successful
-			 * 		Initiate the SeionClip
+			 * 		Initiate the SeionSample
 			 * 		Check if it's autodisposable
 			 *
 			 * Return the clip (if any).
@@ -100,7 +97,8 @@ package com.SeiON
 			var a:SeionSample = new SeionSample(SeionInstance._secretKey);
 			if (manager.seion_ns::alloc(a, autodispose))
 			{
-				SeionSample.init(a, name, manager, snd, sampleDuration, repeat, autodispose, sndTransform);
+				SeionSample.init(a, name, manager, snd, sampleDuration, repeat, autodispose,
+								sndTransform);
 				if (autodispose)	a = null;
 			}
 			else
@@ -120,24 +118,9 @@ package com.SeiON
 		/** Plays the sound from the beginning again according to sndProperties. (ISeionInstance) */
 		override public function play():void
 		{
-			/*
-			 * Adapted from SeionClip.play(), changelog:
-			 *  1. Removed onRepeatPhase conditions. SeionSample repeats internally in
-			 * 		sampleData(), so no tweaking of play() is necessary for repeat conditions.
-			 *  2. Changed "starting up the sound" to reflect "_out" variable
-			 *  3. Added _paused initialisation to force isPaused() to return true.
-			 * 	4. See @@ markers
-			 */
-			
-			// Checking for dispose
-			if (isDisposed())	return;
-			
-			stop(); // for safety's sake
-			
-			// @@ Removed truncation code
-			
-			_paused = true;
-			resume();
+			stop(); // to go to the beginning
+			_paused = true; // to trigger resume
+			resume(); // 'cos play() is essentially resume() from 0
 		}
 		
 		/** Stops the sound and resets it to Zero. (ISeionInstance) */
@@ -146,45 +129,38 @@ package com.SeiON
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			super.stop();
-			_paused = false;
-			
-			_samplesPosition = 0;
-			//if (_out) 'cos _out will nv be null, unless dispose() has been called
+			if (isPlaying || isPaused)
+			{
+				if (_sndChannel)
+				{
+					_sndChannel.stop();
+					_sndChannel = null;
+				}
+				
+				repeat = repeat; // to reset repeatLeft to the full repeat value
+				_paused = false;
+				_samplePosition = 0;
 				_out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
+			}
 		}
 		
 		/** Resumes playback of sound. (ISeionControl) */
 		override public function resume():void
 		{
-			/*
-			 * Adapted from SeionClip.resume(), changelog:
-			 *  1. Added _paused initialisation.
-			 *  2. Changed "starting up the sound" to reflect "_out" variable
-			 *  3. See @@
-			 */
-			
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			// if manager is paused, no resuming allowed!
-			if (manager.isPaused)	return;
-			
-			// resume is only valid if it were paused in the 1st place
-			if (isPaused)
+			// Resume only if Manager not paused && this clip was paused
+			if (!manager.isPaused && isPaused)
 			{
-				// @@ removed truncation code
-				// starting up the sound
-				_samplesPosition -= _latency * 44.1 * 0.8;
-				if (_samplesPosition < 0)
-					_samplesPosition = 0;
+				// ------ Starting up the sound
+				// adjusting playback position for latency
+				_samplePosition -= _latency * 44.1 * 0.8;
+				if (_samplePosition < 0)
+					_samplePosition = 0;
 				
 				_out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
-				_sndChannel = _out.play(0, 0, soundtransform);
-				
-				// setting volume and panning - triggering properties to set for us
-				volume = volume;
-				pan = pan;
+				_sndChannel = _out.play(0, 0, _sndTransform);
 				
 				_paused = false;
 			}
@@ -193,15 +169,6 @@ package com.SeiON
 		/** Pauses playback of sound. (ISeionControl) */
 		override public function pause():void
 		{
-			/*
-			 * Adapted from SeionClip.pause(), changelog:
-			 *  1. Removed pausedLocation stuff
-			 *  2. Removed soundChannel's unnecessary EventListener
-			 *  3. Removed truncation stuff
-			 *  4. Added _paused initialisation.
-			 *  5. Added latency sampling issues
-			 */
-			
 			// Checking for dispose
 			if (isDisposed())	return;
 			
@@ -209,7 +176,7 @@ package com.SeiON
 			{
 				_paused = true;
 				
-				_samplesPosition -= _latency * 44.1 * 0.07; //0.07 + 0.8 = 0.87
+				_samplePosition -= _latency * 44.1 * 0.07; //0.07 + 0.8 = 0.87
 				_sndChannel.stop();
 				_sndChannel = null;
 				_out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
@@ -221,10 +188,8 @@ package com.SeiON
 		 **********************************************************************************/
 		
 		/** The playback and decode latency. */
-		public function get latency():Number
-		{
-			return _latency;
-		}
+		public function get latency():Number	{	return _latency;	}
+		
 		// ------------------------------------- ABSTRACT ----------------------------------
 		
 		/** Is the sound active? (ISeionInstance) */
@@ -232,32 +197,20 @@ package com.SeiON
 		{
 			// Checking for dispose
 			if (isDisposed())	return false;
-			
 			return _out.hasEventListener(SampleDataEvent.SAMPLE_DATA);
 		}
 		
 		/** Is the playback paused? (ISeionControl) */
-		override public function get isPaused():Boolean
-		{
-			return _paused;
-		}
+		override public function get isPaused():Boolean	{	return _paused;	}
 		
 		/** The total <u>sample</u> length of the clip, excluding repeats. <b>NOT</b> in
 		 * milliseconds, but in samples. (ISeionInstance) */
-		override public function get length():Number
-		{
-			return _samplesTotal;
-		}
+		override public function get length():Number	{	return _samplesTotal;	}
 		
 		/**
-		 * How far into the clip we are. In Milliseconds. (ISeionInstance) <p></p>
-		 * Includes offsets or truncations, eg. a 10 second sound with 5 seconds offset at
-		 * starting position would report a position of 0, not 5.
+		 * How far into the clip we are. In Milliseconds. (ISeionInstance)
 		 */
-		override public function get position():Number
-		{
-			return progress * _snd.length;
-		}
+		override public function get position():Number	{	return progress * _snd.length;	}
 		
 		/**
 		 * How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>
@@ -270,7 +223,7 @@ package com.SeiON
 				return 0;
 			
 			// fixing the latency caused by sampling
-			var temp:Number = (_samplesPosition - (_latency * 44.1));
+			var temp:Number = (_samplePosition - (_latency * 44.1));
 			if (temp < 0)
 				temp += _samplesTotal;
 			return temp / _samplesTotal;
@@ -301,13 +254,13 @@ package com.SeiON
 			while( 0 < readLength )
 			{
 				// if we read the whole of length, we're gonna overshot EOF
-				if( _samplesPosition + readLength > _samplesTotal )
+				if( _samplePosition + readLength > _samplesTotal )
 				{
 					// Hence, we read what little is left at the end of buffer.
-					var read: int = _samplesTotal - _samplesPosition;
+					var read: int = _samplesTotal - _samplePosition;
 					
-					 _snd.extract( target, read, _samplesPosition + MAGIC_DELAY );
-					_samplesPosition += read; //advance read-head by amount read
+					_snd.extract( target, read, _samplePosition + MAGIC_DELAY );
+					_samplePosition += read; //advance read-head by amount read
 					readLength -= read;
 				}
 				else // we will not overshot EOF
@@ -316,17 +269,16 @@ package com.SeiON
 					 * Advance read-head by amount read
 					 * And declare finished. (length == 0 will force function exit)
 					 */
-					 _snd.extract( target, readLength, _samplesPosition + MAGIC_DELAY );
-					_samplesPosition += readLength;
+					 _snd.extract( target, readLength, _samplePosition + MAGIC_DELAY );
+					_samplePosition += readLength;
 					readLength = 0;
 				}
-				// We have read to EOF, wrap?
-				if( _samplesPosition == _samplesTotal ) // END OF LOOP > WRAP
+				
+				if( _samplePosition == _samplesTotal ) // We have read to EOF, wrap?
 				{
 					// Check repeat status
-					onSoundComplete();
-					if (isPlaying) // Wrap
-						_samplesPosition = 0;
+					if (onSoundComplete())
+						_samplePosition = 0; // Wrap
 					else // Finish repeating, END
 						return;
 				}
@@ -334,36 +286,29 @@ package com.SeiON
 		}
 		
 		/**
-		 * To be called whenever we play finish one loop
-		 * @param	e	Useless
-		 *
-		 * @private
+		 * To be called whenever we play finish one loop.
+		 * @return	Whether the sound should continue looping
 		 */
-		override protected function onSoundComplete(e:Event = null):void
+		private function onSoundComplete():Boolean
 		{
-			/*
-			 * NOTE: This is adapted from super.onSoundComplete(), with the following changes:
-			 * 	1. play() & associated code removed.
-			 *
-			 * After all, we only interfere if we want to end the loop. Else continue.
-			 */
-			if (e)	e.stopImmediatePropagation();
-			if (repeatLeft >= 0) // repeating
+			if (repeatLeft >= 0) // 0 is infinite, -1 is no repeat
 			{
-				if (repeatLeft == 0) // infinite loop
-				{}
+				if (repeatLeft != 0)
+					_repeat --;
 				else if (repeatLeft == 1) // the last time
 					_repeat = -1;
 				
 				dispatcher.dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
+				return false;
 			}
-			else // disposing
+			else // no more repeats
 			{
 				dispatcher.dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
 				if (autodispose)
 					dispose();
 			}
+			return true;
 		}
 	}
 }

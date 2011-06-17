@@ -21,10 +21,12 @@ package com.SeiON
 		 * _name:		Name of this object
 		 * _volume, _pan:	The adjustable property of the sound. Different from the sndTransform
 		 * 					that's passed in the constructor
-		 * _repeat:		Times to repeat
 		 *
-		 * _initialRepeat:	The fixed repeat count of the sound
-		 * _sndTransform:	The fixed property of the sound
+		 * _repeat:			Times to repeat
+		 * _fixedRepeat:	The fixed repeat count of the sound
+		 *
+		 * _sndTransform:		Holds the modded properties, after manager's properties are applied
+		 * _fixedSndTransform:	The fixed property of the sound
 		 *
 		 * _manager:	The SeionGroup that manages this SeionInstance
 		 * _snd:		The native Flash Sound() object
@@ -36,14 +38,18 @@ package com.SeiON
 		private var _name:String;
 		private var _volume:Number = 1.0;
 		private var _pan:Number = 0; /** @private */
-		protected var _repeat:int;
 		
-		private var _initialRepeat:int;
-		private var _sndTransform:SoundTransform;
+		/** @private */
+		protected var _repeat:int;
+		private var _fixedRepeat:int;
+		
+		/** @private */
+		protected var _sndTransform:SoundTransform;
+		private var _fixedSndTransform:SoundTransform;
 		
 		/** @private */
 		protected var _manager:SeionGroup; /** @private */
-		protected var _snd:Sound;
+		protected var _snd:Sound; /** @private */
 		protected var _sndChannel:SoundChannel;
 		private var _autodispose:Boolean;
 		private var _dispatcher:EventDispatcher;
@@ -81,8 +87,13 @@ package com.SeiON
 			
 			si._autodispose = autodispose;
 			si._sndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
+			si._fixedSndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
 			
 			si._dispatcher = new EventDispatcher();
+			
+			// pre-setting
+			si.volume = 1;
+			si.pan = 0;
 			
 			if (autodispose)
 				si.play();
@@ -118,7 +129,7 @@ package com.SeiON
 		public function get dispatcher():EventDispatcher	{	return _dispatcher;	}
 		
 		/** Returns the predefined sound properties of the sound. (ISeionInstance) */
-		public function get soundtransform():SoundTransform	{	return _sndTransform;	}
+		public function get soundtransform():SoundTransform	{	return _fixedSndTransform;	}
 		
 		/**
 		 *  How many times the SeionInstance is programmed to repeat itself. <br />
@@ -127,13 +138,13 @@ package com.SeiON
 		 *
 		 * ISeionInstance
 		 */
-		public function get repeat():int	{	return _initialRepeat;	}
+		public function get repeat():int	{	return _fixedRepeat;	}
 		public function set repeat(value:int):void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			_repeat = _initialRepeat = Math.max( -1, value);
+			_repeat = _fixedRepeat = Math.max( -1, value);
 		}
 		
 		/**
@@ -160,18 +171,12 @@ package com.SeiON
 			
 			_volume = value;
 			
+			// final Volume = native Volume * current Volume * parent's volume
+			_sndTransform.volume = _fixedSndTransform.volume * _volume * _manager.volume;
+			
+			//assigning value back to soundChannel
 			if (isPlaying)
-			{
-				var volValue:Number;
-				
-				// final Volume = native Volume * current Volume * parent's volume
-				volValue = _sndTransform.volume * _volume * _manager.volume;
-				
-				//assigning value back to soundChannel
-				var channelSndTransform:SoundTransform = _sndChannel.soundTransform;
-				channelSndTransform.volume = volValue;
-				_sndChannel.soundTransform = channelSndTransform;
-			}
+				_sndChannel.soundTransform = _sndTransform;
 		}
 		
 		/**
@@ -188,24 +193,21 @@ package com.SeiON
 			
 			_pan = value;
 			
+			// Calculating Pan
+			var panValue:Number; //local <- faster access
+			
+			var desiredDir:int = (_pan > 0) ? 1 : -1;
+			var amtToMove:Number = (desiredDir - _fixedSndTransform.pan) * Math.abs(_pan);
+			panValue = amtToMove + _fixedSndTransform.pan;
+			
+			//adding on the parent's panning
+			desiredDir = (_manager.pan > 0) ? 1 : -1;
+			amtToMove = (desiredDir - panValue) * Math.abs(_manager.pan);
+			_sndTransform.pan = amtToMove + panValue;
+			
+			//assigning value back to soundChannel
 			if (isPlaying)
-			{
-				var panValue:Number;
-				
-				var desiredDir:int = (_pan > 0) ? 1 : -1;
-				var amtToMove:Number = (desiredDir - _sndTransform.pan) * Math.abs(_pan);
-				panValue = amtToMove + _sndTransform.pan;
-				
-				//adding on the parent's panning
-				desiredDir = (_manager.pan > 0) ? 1 : -1;
-				amtToMove = (desiredDir - panValue) * Math.abs(_manager.pan);
-				panValue = amtToMove + panValue;
-				
-				//assigning value back to soundChannel
-				var channelSndTransform:SoundTransform = _sndChannel.soundTransform;
-				channelSndTransform.pan = panValue;
-				_sndChannel.soundTransform = channelSndTransform;
-			}
+				_sndChannel.soundTransform = _sndTransform;
 		}
 		
 		/*****************************************************************************
@@ -216,7 +218,7 @@ package com.SeiON
 		{
 			isDisposed();
 			
-			_sndTransform = null;
+			_fixedSndTransform = null;
 			_manager = null;
 			_snd = null;
 			_dispatcher = null;

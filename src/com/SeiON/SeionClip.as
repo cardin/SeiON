@@ -43,10 +43,7 @@
 		 *
 		 * @see SeionClip#create()
 		 */
-		public function SeionClip(secretKey:*)
-		{
-			super(secretKey);
-		}
+		public function SeionClip(secretKey:*) {	super(secretKey);	}
 		
 		/** The initialisation function. */
 		protected static function init(sc:SeionClip, name:String, manager:SeionGroup, snd:Sound,
@@ -204,21 +201,14 @@
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			// if manager is paused, no resuming allowed!
-			if (_manager.isPaused)	return;
-			
-			// resume is only valid if it were paused in the 1st place
-			if (isPaused)
+			// Resume only if Manager not paused && this clip was paused
+			if (!manager.isPaused && isPaused)
 			{
 				// resuming _truncation
 				_truncation.resume();
 				
 				// starting up the _snd
-				_sndChannel = _snd.play(pausedLocation, 0, soundtransform);
-				
-				// setting volume and panning - triggering properties to set for us
-				volume = volume;
-				pan = pan;
+				_sndChannel = _snd.play(pausedLocation, 0, _sndTransform);
 				
 				/* The _snd might be so short that it finishes before the code executes.
 				 * Just in case.

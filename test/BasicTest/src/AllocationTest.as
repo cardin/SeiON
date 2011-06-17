@@ -55,7 +55,7 @@ package
 		[Embed(source = '../lib/void panic.mp3')]
 		private var sndLoop_cls:Class;
 		private var sndLoop:Sound = new sndLoop_cls() as Sound;
-		private var sndLoop_SC:SeionClip;
+		private var sndLoop_SC:SeionSample;
 		
 		[Embed(source = '../lib/snd_ring.mp3')]
 		private var sndRing_cls:Class;
