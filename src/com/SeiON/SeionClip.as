@@ -319,8 +319,8 @@
 			
 			if (repeatLeft >= 0) // repeating
 			{
-				if (repeatLeft == 0) // infinite loop
-				{}
+				if (repeatLeft != 0)
+					_repeat --;
 				else if (repeatLeft == 1) // the last time
 					_repeat = -1;
 				
