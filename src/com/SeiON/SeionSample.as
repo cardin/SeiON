@@ -309,8 +309,9 @@ package com.SeiON
 			}
 			else // no more repeats
 			{
-				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
+				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
+				
 				if (autodispose)
 					dispose();
 			}

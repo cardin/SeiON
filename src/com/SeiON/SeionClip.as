@@ -329,8 +329,8 @@
 			}
 			else // disposing
 			{
-				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				stop();
+				dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				
 				if (autodispose)
 					dispose();

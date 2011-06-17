@@ -80,7 +80,7 @@ package com.SeiON
 							repeat:int,	autodispose:Boolean, sndTransform:SoundTransform):void
 		{
 			if (manager == null || snd == null)
-				throw new ArgumentError("Arguments cannot be null!");
+				throw new ArgumentError("'manager' and 'snd' arguments cannot be null!");
 			
 			if (sndTransform == null)
 				sndTransform = new SoundTransform();
@@ -121,11 +121,11 @@ package com.SeiON
 		}
 		
 		// ----------------------------------- IEventDispatcher -----------------------------
-		public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void {	_dispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);	}
-		public function dispatchEvent(event:Event):Boolean	{	return _dispatcher.dispatchEvent(event); }
-		public function hasEventListener(type:String):Boolean	{	return _dispatcher.hasEventListener(type);	}
-		public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void	{	_dispatcher.removeEventListener(type, listener, useCapture);	}
-		public function willTrigger(type:String):Boolean	{	return _dispatcher.willTrigger(type);	}
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void {	if (!isDisposed()) _dispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);	}
+		public function dispatchEvent(event:Event):Boolean	{	if (isDisposed()) return false; return _dispatcher.dispatchEvent(event); }
+		public function hasEventListener(type:String):Boolean	{	if (isDisposed()) return false; return _dispatcher.hasEventListener(type);	}
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void	{	if (!isDisposed()) _dispatcher.removeEventListener(type, listener, useCapture);	}
+		public function willTrigger(type:String):Boolean	{	if (isDisposed()) return false; return _dispatcher.willTrigger(type);	}
 		
 		// -------------------------------------- PROPERTIES --------------------------------
 		
@@ -215,6 +215,11 @@ package com.SeiON
 			desiredDir = (_manager.pan > 0) ? 1 : -1;
 			amtToMove = (desiredDir - panValue) * Math.abs(_manager.pan);
 			_sndTransform.pan = amtToMove + panValue;
+			
+			trace("input: " + _pan);
+			trace("before manager :" + panValue);
+			trace("manager: " + _manager.pan);
+			trace("final: " + _sndTransform.pan);
 			
 			//assigning value back to soundChannel
 			if (isPlaying)
