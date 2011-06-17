@@ -9,9 +9,9 @@ package
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	
-	import com.SeiON.Core.SeionEvent;
-	import com.SeiON.ISeionInstance;
-	import com.SeiON.ISeionControl;
+	import com.SeiON.Core.Interface.ISeionInstance;
+	import com.SeiON.Core.Interface.ISeionControl;
+	import com.SeiON.Event.SeionEvent;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;

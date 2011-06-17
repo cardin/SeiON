@@ -1,4 +1,4 @@
-﻿package com.SeiON.Misc
+﻿package com.SeiON.Core
 {
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;

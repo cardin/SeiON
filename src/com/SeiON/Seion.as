@@ -2,6 +2,8 @@ package com.SeiON
 {
 	import flash.errors.IllegalOperationError;
 	
+	import com.SeiON.Core.Interface.ISeionControl;
+	
 	/**
 	 * Global sound control over whole of SeiON.
 	 * <ol>

@@ -1,8 +1,10 @@
-package com.SeiON
+package com.SeiON.Core.Interface
 {
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher
 	import flash.media.SoundTransform;
+	
+	import com.SeiON.SeionGroup;
 	
 	/**
 	 * Additional playback features for SeionInstance and its derivatives.

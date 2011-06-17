@@ -5,8 +5,10 @@
 	import flash.media.Sound;
 	import flash.media.SoundTransform;
 	
-	import com.SeiON.Core.SeionEvent;
-	import com.SeiON.Misc.CountDown;
+	import com.SeiON.Core.CountDown;
+	import com.SeiON.Core.SeionInstance
+	import com.SeiON.Core.seion_ns;
+	import com.SeiON.Event.SeionEvent;
 	import com.SeiON.SeionGroup;
 	
 	/**

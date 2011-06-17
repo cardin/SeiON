@@ -1,4 +1,4 @@
-package com.SeiON
+package com.SeiON.Extras
 {
     import flash.events.Event;
     import flash.events.SampleDataEvent;

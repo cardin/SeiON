@@ -6,6 +6,10 @@
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+	import com.SeiON.Core.seion_ns;
+	import com.SeiON.Core.Interface.ISeionControl;
+	import com.SeiON.Core.Interface.ISeionInstance;
+	
 	/**
 	 * In charge of organising SeionClips, their playback and properties. On instantiation, the
 	 * no. of sound channels that each SeionGroup is allowed is set individually.<p></p>

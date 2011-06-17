@@ -1,4 +1,4 @@
-package com.SeiON
+package com.SeiON.Core.Interface
 {
 	/**
 	 * Basic features that a sound manipulating object should have.

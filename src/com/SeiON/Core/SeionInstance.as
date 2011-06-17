@@ -1,4 +1,4 @@
-package com.SeiON
+package com.SeiON.Core
 {
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
@@ -7,12 +7,13 @@ package com.SeiON
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
+	import com.SeiON.Core.Interface.ISeionInstance;
 	import com.SeiON.SeionGroup;
 	
 	/** Defines the value when a SeionInstance finishes playback and does not repeat. */
 	[Event(name = "soundComplete", type = "flash.events.Event")]
 	/** Defines the value when a SeionInstance loops itself. */
-	[Event(name = "soundRepeat", type = "com.SeiON.Core.SeionEvent")]
+	[Event(name = "soundRepeat", type = "com.SeiON.Event.SeionEvent")]
 	/**
 	 * The base class that all sound-playing Seion classes must inherit. Treat this like an Abstract
 	 * class. Cannot be instantiated. Instead, use the respective subclasses' SeionInstance.create().

@@ -1,8 +1,8 @@
-package com.SeiON.Core
+package com.SeiON.Event
 {
 	import flash.events.Event;
 	
-	import com.SeiON.ISeionInstance;
+	import com.SeiON.Core.Interface.ISeionInstance;
 	
 	/**
 	 * Just like an original Event.

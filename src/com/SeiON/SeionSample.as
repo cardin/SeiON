@@ -6,7 +6,9 @@ package com.SeiON
 	import flash.media.SoundTransform;
 	import flash.utils.ByteArray;
 	
-	import com.SeiON.Core.SeionEvent;
+	import com.SeiON.Event.SeionEvent;
+	import com.SeiON.Core.SeionInstance;
+	import com.SeiON.Core.seion_ns;
 	
 	/**
 	 * Playback MP3-Loop (gapless)
