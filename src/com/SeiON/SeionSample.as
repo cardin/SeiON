@@ -7,7 +7,6 @@ package com.SeiON
 	import flash.utils.ByteArray;
 	
 	import com.SeiON.Core.SeionEvent;
-	import com.SeiON.Core.SeionProperty;
 	
 	/**
 	 * Playback MP3-Loop (gapless)
@@ -80,6 +79,9 @@ package com.SeiON
 		 * autodispose is true.
 		 *
 		 * @see	#name
+		 * @see #length
+		 * @see #autodispose
+		 * @see #soundtransform
 		 */
 		public static function createGaplessMP3(name:String, manager:SeionGroup, snd:Sound,
 						sampleDuration:int, repeat:int,
@@ -167,7 +169,6 @@ package com.SeiON
 				
 				_out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
 				_sndChannel = _out.play(0, 0, _sndTransform);
-				
 				_paused = false;
 			}
 		}
@@ -299,13 +300,13 @@ package com.SeiON
 		{
 			if (repeatLeft >= 0) // 0 is infinite, -1 is no repeat
 			{
-				if (repeatLeft != 0)
-					_repeat --;
-				else if (repeatLeft == 1) // the last time
+				if (repeatLeft == 1) // the last time
 					_repeat = -1;
+				else if (repeatLeft != 0)
+					_repeat --;
 				
 				dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
-				return false;
+				return true;
 			}
 			else // no more repeats
 			{
@@ -317,7 +318,7 @@ package com.SeiON
 					dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				}
 			}
-			return true;
+			return false;
 		}
 	}
 }

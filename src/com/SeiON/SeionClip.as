@@ -1,28 +1,23 @@
 ﻿package com.SeiON
 {
-	import com.SeiON.SeionGroup;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.media.Sound;
-	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	
-	import com.SeiON.seion_ns;
 	import com.SeiON.Core.SeionEvent;
 	import com.SeiON.Misc.CountDown;
+	import com.SeiON.SeionGroup;
 	
 	/**
 	 * The simplest way to play a _snd.<p></p>
 	 *
 	 * SeionClip is a simple wrapper over both the native Sound and the _sndChannel object in
-	 * Flash.<p></p>
-	 *
-	 * Use SeionClip.create() to instantiate this class.
+	 * Flash. Use SeionClip.create() to instantiate this class.
 	 *
 	 * @see #create()
 	 */
-	public class SeionClip extends SeionInstance
+	public final class SeionClip extends SeionInstance
 	{
 		/**
 		 * _offset:		The delayed starting position.
@@ -50,10 +45,10 @@
 									repeat:int,	autodispose:Boolean, sndTransform:SoundTransform,
 									offset:uint, truncate:uint):void
 		{
-			SeionInstance.init(sc, name, manager, snd, repeat, autodispose, sndTransform);
-			
 			sc._offset = offset;
 			sc._truncate = truncate;
+			
+			SeionInstance.init(sc, name, manager, snd, repeat, autodispose, sndTransform);
 		}
 		
 		/**
@@ -153,20 +148,12 @@
 		/** Plays the sound from the beginning again. (ISeionInstance) */
 		override public function play():void
 		{
-			// Checking for dispose
-			if (isDisposed())	return;
+			stop(); // to go to the beginning
 			
-			stop(); // for safety's sake
-			
-			// setting up _truncation
-			// CountDown does not operate if given input = 0
-			_truncation = new CountDown(this.length);
-			_truncation.start();
-			_truncation.pause(); //<-- start&pause cos we using resume() later
-			_truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
-			
+			// if there is no offset/truncate, set countdown(0)
+			_truncation = new CountDown((this.length == _snd.length) ? 0 : this.length);
 			pausedLocation = _offset;
-			resume();
+			resume(); // 'cos play() is essentially resume() from 0
 		}
 		
 		/** Stops the sound and resets it to Zero. (ISeionInstance) */
@@ -205,21 +192,15 @@
 			if (!manager.isPaused && isPaused)
 			{
 				// resuming _truncation
-				_truncation.resume();
-				
-				// starting up the _snd
-				_sndChannel = _snd.play(pausedLocation, 0, _sndTransform);
-				
-				/* The _snd might be so short that it finishes before the code executes.
-				 * Just in case.
-				 * */
-				if (_sndChannel)
-				{
-					_sndChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-					pausedLocation = -1;
-				}
+				_truncation.addEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
+				if (_truncation.paused)
+					_truncation.resume();
 				else
-					onSoundComplete();
+					_truncation.start(); // for when resume() was called by play()
+				
+				_sndChannel = _snd.play(pausedLocation, 0, _sndTransform);
+				_sndChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				pausedLocation = -1;
 			}
 		}
 		
@@ -238,6 +219,7 @@
 				_sndChannel = null;
 				
 				_truncation.pause();
+				_truncation.removeEventListener(TimerEvent.TIMER_COMPLETE, onSoundComplete);
 			}
 		}
 		
@@ -253,20 +235,10 @@
 		// --------------------------------- ABSTRACT --------------------------------
 		
 		/** Is the sound active? (ISeionInstance) */
-		override public function get isPlaying():Boolean
-		{
-			if (_sndChannel)
-				return true;
-			return false;
-		}
+		override public function get isPlaying():Boolean	{	return _sndChannel != null;	}
 		
 		/** Is the playback paused? (ISeionControl) */
-		override public function get isPaused():Boolean
-		{
-			if (pausedLocation == -1)
-				return false;
-			return true;
-		}
+		override public function get isPaused():Boolean	{	return pausedLocation != -1;	}
 		
 		/** The total length of the clip, excluding repeats. In Milliseconds. (ISeionInstance) */
 		override public function get length():Number
@@ -285,46 +257,47 @@
 			// Checking for dispose
 			if (isDisposed())	return 0.0;
 			
-			if (isPaused)
+			if (isPlaying)
+				return _sndChannel.position - _offset;
+			else if (isPaused)
 				return pausedLocation - _offset;
-			else if (!isPlaying) //clip not started yet
+			else
 				return 0;
-			return _sndChannel.position - _offset;
 		}
 		
 		/** How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>
 		 *
 		 * Includes offsets or truncations, eg. a 100 second _snd with 5 seconds offset at
 		 * starting position would report a position of 0.0, not 0.95. */
-		override public function get progress():Number
-		{
-			return position / length;
-		}
+		override public function get progress():Number	{	return position / length;	}
 		
 		/***********************************************************************************
 		 *	 								PRIVATE HELPER METHODS
 		 ***********************************************************************************/
 		
 		/**
-		 * Called when a _snd completes. As for autodispose _snds, they self-dispose.
+		 * Called when a Sound completes. As for autodispose _snds, they self-dispose.
 		 *
-		 * @param	e	Not important. e == null when _truncation cuts it short, else this function
-		 * 				was called by Event.SOUND_COMPLETE.
-		 *
-		 * @private
+		 * @param	e	e == null when _truncation cuts it short, else this function
+		 * 				was called by soundChannel's SOUND_COMPLETE.
 		 */
-		protected function onSoundComplete(e:Event = null):void
+		private function onSoundComplete(e:Event = null):void
 		{
 			if (e)		e.stopImmediatePropagation();
 			
 			if (repeatLeft >= 0) // repeating
 			{
-				if (repeatLeft != 0)
-					_repeat --;
-				else if (repeatLeft == 1) // the last time
+				if (repeatLeft == 1) // the last time
 					_repeat = -1;
+				else if (repeatLeft != 0)
+					_repeat --;
 				
-				repeatSound();
+				// resetting variables back to beginning
+				pausedLocation = _offset;
+				repeat = repeat;
+				_truncation.stop();
+				resume();
+				
 				dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
 			}
 			else // disposing
@@ -337,17 +310,6 @@
 					dispatchEvent(new SeionEvent(Event.SOUND_COMPLETE, this));
 				}
 			}
-		}
-		
-		/**
-		 * Makes the sound repeat.
-		 */
-		private function repeatSound():void
-		{
-			// 'cos variables are lost in play() and play()'s stop(), we record them
-			var tmpRepeat:int = repeatLeft; //TODO fix this hack; not supposed to expose _repeat!
-			play();
-			_repeat = tmpRepeat;
 		}
 	}
 }

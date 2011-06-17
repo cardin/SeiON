@@ -23,7 +23,7 @@
 		private var _paused:Boolean = false;
 		
 		/**
-		 * @param	time	The countdown timing. (Milliseconds)
+		 * @param	time	The countdown timing. (Milliseconds) If 0, CountDown refuses to start.
 		 */
 		public function CountDown(time:int)
 		{
