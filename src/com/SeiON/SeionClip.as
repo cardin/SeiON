@@ -287,16 +287,13 @@
 		{
 			if (e)		e.stopImmediatePropagation();
 			
-			if (repeatLeft >= 0) // repeating
+			if (repeatLeft > 0 || repeatLeft == -1) // repeating
 			{
-				if (repeatLeft == 1) // the last time
-					_repeat = -1;
-				else if (repeatLeft != 0)
-					_repeat --;
+				if (repeatLeft != -1)
+					_repeatLeft --;
 				
 				// resetting variables back to beginning
-				pausedLocation = _offset;
-				repeat = repeat;
+				_pausedLocation = _offset;
 				_truncation.stop();
 				resume();
 				

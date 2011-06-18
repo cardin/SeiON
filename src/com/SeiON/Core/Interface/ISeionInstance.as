@@ -46,8 +46,8 @@ package com.SeiON.Core.Interface
 		
 		/**
 		 * How many times the SeionInstance is programmed to repeat itself. <br />
-		 * 0 means infinite repeats.<br />
-		 * -1 means no repeats.<p></p>
+		 * 0 means no repeats.<br />
+		 * -1 means infinite repeats.<p></p>
 		 *
 		 * ISeionInstance
 		 */
@@ -57,8 +57,8 @@ package com.SeiON.Core.Interface
 		/**
 		 * How many more times the SeionInstance has to repeat itself. To reset repeatLeft, set
 		 * repeat. <br />
-		 * 0 means infinite repeats.<br />
-		 * -1 means no repeats.<p></p>
+		 * 0 means no repeats.<br />
+		 * -1 means infinite repeats.<p></p>
 		 *
 		 * ISeionInstance
 		 */

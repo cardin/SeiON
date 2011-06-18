@@ -300,12 +300,10 @@ package com.SeiON
 		 */
 		private function onSoundComplete():Boolean
 		{
-			if (repeatLeft >= 0) // 0 is infinite, -1 is no repeat
+			if (repeatLeft > 0 || repeatLeft == -1) // -1 is infinite, 0 is no repeat
 			{
-				if (repeatLeft == 1) // the last time
-					_repeat = -1;
-				else if (repeatLeft != 0)
-					_repeat --;
+				if (repeatLeft != -1)
+					_repeatLeft --;
 				
 				dispatchEvent(new SeionEvent(SeionEvent.SOUND_REPEAT, this));
 				return true;
