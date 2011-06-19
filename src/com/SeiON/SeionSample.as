@@ -26,7 +26,8 @@ package com.SeiON
 	 */
 	
 	/**
-	 * An ISeionInstance that plays gap-less looping MP3 sounds via specifying sample range.
+	 * An ISeionInstance that plays gap-less looping MP3 sounds via specifying sample range. It is
+	 * more intensive than SeionClip, but perhaps not perceivably so.
 	 *
 	 * @see https://github.com/cardin/SeiON/wiki/Gapless-MP3-Looping
 	 */
@@ -52,8 +53,11 @@ package com.SeiON
 		 */
 		private var _paused:Boolean = false;
 		
-		/**.
-		 * @inheritDoc
+		/**
+		 * Please do not call this constructor directly; it will throw an error. Call it through
+		 * SeionSample.create().
+		 *
+		 * @see SeionSample#create()
 		 */
 		public function SeionSample(secretKey:*) {	super(secretKey);	}
 		

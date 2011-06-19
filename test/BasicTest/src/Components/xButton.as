@@ -30,7 +30,7 @@ package Components
 		{
 			super.rollHandler(e);
 			if (e.type == MouseEvent.ROLL_OVER)
-				SeionClip.create("", sg, snd, -1, true);
+				SeionClip.create("", sg, snd, 0, true);
 		}
 	}
 }

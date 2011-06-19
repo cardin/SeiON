@@ -1,17 +1,15 @@
 package
 {
-	import flash.display.DisplayObjectContainer;
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.media.Sound;
-	import flash.text.TextField;
+	import flash.display.*;
+	import flash.events.*;
+	import flash.media.*;
+	import flash.text.*;
+	
+	import Components.*;
 	
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
-	
-	import Components.Button;
-	import Components.RangeProgressSlider;
 	
 	/**
 	 * A simple test to show how to use the offset and duration properties of SeionProperty,
@@ -22,14 +20,11 @@ package
 		// Retrieved from http://www.jazzhouseblues.com/
 		[Embed(source='../lib/Muffin Man Swing.mp3')]
 		private var snd_class:Class;
-		private var snd:Sound;
+		private var snd:Sound = new snd_class() as Sound;
 		
 		// The SeionGroup to hold our SeionClips
 		private var sndGrp:SeionGroup;
-		
-		private var sndClip1:SeionClip;
-		private var sndClip2:SeionClip;
-		private var sndClip3:SeionClip;
+		private var sndClip1:SeionClip, sndClip2:SeionClip, sndClip3:SeionClip;
 		
 		// 3 diff properties to be applied
 		private var offset1:uint, truncate1:uint;
@@ -38,23 +33,21 @@ package
 		
 		public function TruncationTest(container: DisplayObjectContainer)
 		{
-			snd = new snd_class() as Sound;
 			sndGrp = Seion.createSeionGroup("", 3);
-			// for caution, I don't advise cutting it this close [3] for production usage.
-			
 			init_render(container);
 		}
 		
-		/** Starts playing the sound using the selected property. */
+		/** Starts playing the sound using the selected property.
+		 * @see	SeionClip#createExcerpt()*/
 		public function startTest(choice:uint):void
 		{
 			var sc:SeionClip = this["sndClip" + choice];
 			
 			if (sc == null) //not created yet
 			{
-				this["sndClip" + choice] = SeionClip.createExcerpt("", sndGrp, snd, 0, false, null,
+				this["sndClip" + choice] = SeionClip.createExcerpt("", sndGrp, snd, -1, false, null,
 												this["offset" + choice], this["truncate" + choice]);
-				this["sndClip" + choice].play();
+				SeionClip(this["sndClip" + choice]).play();
 			}
 			else //pause the existing sc
 			{
@@ -70,19 +63,16 @@ package
 			if (sc == null) // if not created, then nothing to stop
 				return;
 			
-			sc.stop();
+			//sc.stop(); //dispose() autocalls stop()
 			sc.dispose();
 			this["sndClip" + choice] = null;
 		}
 		
 		// ================================ RENDERING FUNCTIONS ===========================
 		
-		private var play1:Button;
-		private var stop1:Button;
-		private var play2:Button;
-		private var stop2:Button;
-		private var play3:Button;
-		private var stop3:Button;
+		private var play1:Button, stop1:Button;
+		private var play2:Button, stop2:Button;
+		private var play3:Button, stop3:Button;
 		
 		private var slider1:RangeProgressSlider;
 		private var slider2:RangeProgressSlider;
@@ -112,12 +102,9 @@ package
 			descript.multiline = true;
 			descript.wordWrap = true;
 			descript.mouseEnabled = false;
-			descript.htmlText = "<p align='justify'>ISeionInstances are created from a sound source "
-				+ "and a SeionProperty. By having different SeionProperties, one can generate "
-				+ "variations using a single source. </p><br>"
-				+ "<p align='justify'>Besides volume and panning, SeionClips can also vary the "
-				+ "starting offset and duration. Here, shorter sounds are generated using portions "
-				+ "of a longer sound. Note that this feature is not available to SeionSample.</p>";
+			descript.htmlText = "<p align='justify'>SeionClips can vary the starting offset and "
+				+ "duration. Here, shorter sounds are generated using portions of a longer sound. "
+				+ "Note that this feature is not available to SeionSample.</p>";
 			descript.x = 25;
 			descript.y = 10;
 			descript.width = 400;
@@ -144,7 +131,8 @@ package
 			container.addEventListener(Event.ENTER_FRAME, render);
 		}
 		
-		/** Updates the UI on the stage. */
+		/** Updates the UI on the stage.
+		 * @see ISeionInstance#progress */
 		private function render(e:Event):void
 		{
 			// Updating buttons
@@ -200,7 +188,9 @@ package
 			}
 		}
 		
-		/** Updates the SeionProperties with the slider values. */
+		/** Updates the SeionProperties with the slider values.
+		 * @see SeionClip#offset
+		 * @see SeionClip#truncate */
 		private function updateSndProp(choice:uint):void
 		{
 			this["offset" + choice] = this["slider" + choice].lRange * snd.length;

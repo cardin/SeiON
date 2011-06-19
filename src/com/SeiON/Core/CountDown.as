@@ -23,6 +23,7 @@
 		private var _paused:Boolean = false;
 		
 		/**
+		 * Creates a countdown timer.
 		 * @param	time	The countdown timing. (Milliseconds) If 0, CountDown refuses to start.
 		 */
 		public function CountDown(time:int)
@@ -50,7 +51,7 @@
 			}
 		}
 		
-		/** @private */
+		/** Disabled. */
 		override public function get repeatCount():int {	return 1;	}
 		override public function set repeatCount(value:int):void {}
 		

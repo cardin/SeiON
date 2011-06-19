@@ -1,29 +1,22 @@
 package
 {
-	import flash.display.DisplayObjectContainer;
-	import flash.display.Sprite;
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.media.Sound;
-	import flash.media.SoundTransform;
-	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;
+	import flash.display.*;
+	import flash.events.*;
+	import flash.media.*;
+	import flash.text.*;
 	
-	import com.SeiON.Core.Interface.ISeionInstance;
+	import Components.*;
+	
 	import com.SeiON.Core.Interface.ISeionControl;
+	import com.SeiON.Core.SeionInstance;
 	import com.SeiON.Event.SeionEvent;
 	import com.SeiON.Seion;
 	import com.SeiON.SeionClip;
 	import com.SeiON.SeionGroup;
 	import com.SeiON.SeionSample;
 	
-	import Components.PanningBar;
-	import Components.ProgressBar;
-	import Components.VolBar;
-	import Components.xButton;
-	
 	/**
-	 * Showcases Seion allocates and manages all the instances of sound that are playing.
+	 * Showcases how Seion allocates and manages all the instances of sound that are playing.
 	 */
 	public class AllocationTest
 	{
@@ -95,24 +88,24 @@ package
 				switch (name)
 				{
 					case "sndLoop":
-						sndLoop_SC = SeionSample.createGaplessMP3(name, sg, sndLoop, 124510, 0, false);
+						sndLoop_SC = SeionSample.createGaplessMP3(name, sg, sndLoop, 124510, -1, false);
 						break;
 					default:
-						this[name + "_SC"] = SeionClip.create(name, sg, this[name], -1, false);
+						this[name + "_SC"] = SeionClip.create(name, sg, this[name], 0, false);
 						break;
 				}
 				
 				// if null, tt means we weren't able to create
 				if (this[name + "_SC"] != null)
 				{
-					ISeionInstance(this[name + "_SC"]).addEventListener(Event.SOUND_COMPLETE, onComplete);
-					ISeionInstance(this[name + "_SC"]).play();
+					SeionInstance(this[name + "_SC"]).addEventListener(Event.SOUND_COMPLETE, onComplete);
+					SeionInstance(this[name + "_SC"]).play();
 				}
 			}
 			else //pause the sound
 			{
-				if (this[name + "_SC"].isPlaying)	ISeionInstance(this[name + "_SC"]).pause();
-				else								ISeionInstance(this[name + "_SC"]).resume();
+				if (this[name + "_SC"].isPlaying)	SeionInstance(this[name + "_SC"]).pause();
+				else								SeionInstance(this[name + "_SC"]).resume();
 			}
 		}
 		
@@ -123,9 +116,9 @@ package
 		{
 			if (this[name + "_SC"] != null)
 			{
-				ISeionInstance(this[name + "_SC"]).stop();
-				ISeionInstance(this[name + "_SC"]).removeEventListener(Event.SOUND_COMPLETE, onComplete);
-				ISeionInstance(this[name + "_SC"]).dispose();
+				SeionInstance(this[name + "_SC"]).stop();
+				SeionInstance(this[name + "_SC"]).removeEventListener(Event.SOUND_COMPLETE, onComplete);
+				SeionInstance(this[name + "_SC"]).dispose();
 				this[name + "_SC"] = null;
 			}
 		}
@@ -136,11 +129,11 @@ package
 		 */
 		private function onComplete(e:SeionEvent):void
 		{
-			stopSnd(e.targetSndObj.name);
+			stopSnd(SeionInstance(e.targetSndObj).name);
 		}
 		
 		/**
-		 * Modifies the properites of the sound object of the specified name.
+		 * Modifies the properties of the sound object of the specified name.
 		 */
 		private function setSndProp(name:String, vol:Number = -99, pan:Number = -99):void
 		{
@@ -331,13 +324,12 @@ package
 			label.wordWrap = label.multiline = true;
 			label.autoSize = TextFieldAutoSize.LEFT;
 			label.width = 350;
-			label.htmlText = "<p align='justify'>Each sound is played via selected SeionGroups, "
-				+ "and group controllable. In this demo, only the Volume and Pan controls are "
-				+ "exposed.</p><br>"
-				+ "<p align='justify'>Each SeionGroup has fixed allocations. If run out, new "
-				+ "sounds can't be played. However, if the intended sond is autodisposable, "
-				+ "spare allocations may be borrowed (eg. compare 'Spam Ringing' against "
-				+ "playing a BG sound).</p>";
+			label.htmlText = "<p align='justify'>As Spam Ringing uses autodispose sounds, it can "
+				+ "borrow more sounds from Seion beyond its 10 allocations.</p><br>"
+				+ "<p align='justify'>Both the Misc loop sound and button rollover share the same "
+				+ "SeionGroup. As button rollover is disposable, it can borrow as well.</p><br />"
+				+ "<p align='justify'>BG sounds are non-autodisposable. Hence it's strictly limited "
+				+ "to only 2 simultaneous sounds.</p>";
 			label.x = 30;		label.y = 10;
 			container.addChild(label);
 		}
@@ -455,7 +447,7 @@ package
 				// --------------------------------- Spamming Ringing Sounds
 				// 1 autodispose ring per enterFrame
 				if (triggerRing)
-					SeionClip.create("", sgRing, sndRing, -1, true);
+					SeionClip.create("", sgRing, sndRing, 0, true);
 		}
 		
 		/** Responds to button presses */

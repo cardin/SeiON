@@ -16,10 +16,12 @@ package com.SeiON.Core
 	[Event(name = "soundRepeat", type = "com.SeiON.Event.SeionEvent")]
 	/**
 	 * The base class that all sound-playing Seion classes must inherit. Treat this like an Abstract
-	 * class. Cannot be instantiated. Instead, use the respective subclasses' SeionInstance.create().
+	 * class. Cannot be instantiated. Instead, use the respective subclasses'
+	 * SeionInstance.create(). <p></p>
 	 *
 	 * SeionInstance adds control capabilities and is managed by SeionGroup as part of SeiON's
-	 * effort to control the no. of SoundChannels playing simultaneously.
+	 * effort to control the no. of SoundChannels playing simultaneously. Extend this class to
+	 * create custom playback functionality that makes use of SeiON's allocation infrastructure.
 	 */
 	public class SeionInstance implements ISeionInstance
 	{
