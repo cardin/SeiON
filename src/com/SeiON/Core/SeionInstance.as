@@ -28,8 +28,8 @@ package com.SeiON.Core
 		 * _volume, _pan:	The adjustable property of the sound. Different from the sndTransform
 		 * 					that's passed in the constructor
 		 *
-		 * _repeat:			Times to repeat
-		 * _fixedRepeat:	The fixed repeat count of the sound
+		 * _repeatLeft:			Times to repeat
+		 * _repeat:	The fixed repeat count of the sound
 		 *
 		 * _sndTransform:		Holds the modded properties, after manager's properties are applied
 		 * _fixedSndTransform:	The fixed property of the sound
@@ -46,8 +46,8 @@ package com.SeiON.Core
 		private var _pan:Number = 0; /** @private */
 		
 		/** @private */
-		protected var _repeat:int;
-		private var _fixedRepeat:int;
+		protected var _repeatLeft:int;
+		private var _repeat:int;
 		
 		/** @private */
 		protected var _sndTransform:SoundTransform;
@@ -60,7 +60,7 @@ package com.SeiON.Core
 		private var _autodispose:Boolean;
 		private var _dispatcher:EventDispatcher;
 		
-		// A secret code passed in the constructor to ensure the constructor remains private.
+		/** A secret code passed in the constructor to ensure the constructor remains private. @private */
 		protected static const _secretKey:Number = Math.random();
 		
 		/**
@@ -76,12 +76,14 @@ package com.SeiON.Core
 				+ "access! Please use SeionInstance.create() instead.");
 		}
 		
-		/** The initialisation function. */
+		/** The initialisation function. @private */
 		protected static function init(si:SeionInstance, name:String, manager:SeionGroup, snd:Sound,
 							repeat:int,	autodispose:Boolean, sndTransform:SoundTransform):void
 		{
 			if (manager == null || snd == null)
 				throw new ArgumentError("'manager' and 'snd' arguments cannot be null!");
+			if (repeat == -1 && autodispose)
+				throw new ArgumentError("You cannot have an infinitely repeating sound that is autodisposable!");
 			
 			if (sndTransform == null)
 				sndTransform = new SoundTransform();
@@ -89,7 +91,7 @@ package com.SeiON.Core
 			si._name = name;
 			si._manager = manager;
 			si._snd = snd;
-			si._repeat = repeat;
+			si._repeat = si._repeatLeft = repeat;
 			
 			si._autodispose = autodispose;
 			si._sndTransform = new SoundTransform(sndTransform.volume, sndTransform.pan);
@@ -145,29 +147,29 @@ package com.SeiON.Core
 		
 		/**
 		 *  How many times the SeionInstance is programmed to repeat itself. <br />
-		 * 0 means infinite repeats.<br />
-		 * -1 means no repeats.<p></p>
+		 * 0 means no repeats.<br />
+		 * -1 means infinite repeats.<p></p>
 		 *
 		 * ISeionInstance
 		 */
-		public function get repeat():int	{	return _fixedRepeat;	}
+		public function get repeat():int	{	return _repeat;	}
 		public function set repeat(value:int):void
 		{
 			// Checking for dispose
 			if (isDisposed())	return;
 			
-			_repeat = _fixedRepeat = Math.max( -1, value);
+			_repeatLeft = _repeat = Math.max( -1, value);
 		}
 		
 		/**
 		 * How many more times the SeionInstance has to repeat itself. To reset repeatLeft, set
 		 * repeat. <br />
-		 * 0 means infinite repeats.<br />
-		 * -1 means no repeats.<p></p>
+		 * 0 means no repeats.<br />
+		 * -1 means infinite repeats.<p></p>
 		 *
 		 * ISeionInstance
 		 */
-		public function get repeatLeft():int	{	return _repeat;	}
+		public function get repeatLeft():int	{	return _repeatLeft;	}
 		
 		/**
 		 * Get: The volume as affected by its parent. <p></p>
