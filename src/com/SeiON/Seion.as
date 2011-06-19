@@ -3,6 +3,7 @@ package com.SeiON
 	import flash.errors.IllegalOperationError;
 	
 	import com.SeiON.Core.Interface.ISeionControl;
+	import com.SeiON.Core.seion_ns;
 	
 	/**
 	 * Global sound control over whole of SeiON.
@@ -141,6 +142,27 @@ package com.SeiON
 			// insert into collection
 			sndGroup.push(sg);
 			return sg;
+		}
+		
+		/**
+		 * A GC Function called by a SeionGroup, that forces Seion to go thru all SeionGroups and
+		 * try to reclaim at least 1 borrowed allocation, in the hopes that it will allow the callee
+		 * SeionGroup to create another sound.
+		 *
+		 * NOTE: This won't work if Seion was never left with any spare allocations in the 1st place.
+		 * @param	sg	The SeionGroup that called this function
+		 * @return If true, it means SeionGroup can go ahead and try to alloc(..) again.
+		 * @private
+		 */
+		internal static function forceAlloc(callee:SeionGroup):Boolean
+		{
+			for each (var sg:SeionGroup in sndGroup)
+			{
+				if (sg == callee)	continue;
+				sg.seion_ns::killSound();
+				if (allocation != 0)	return true;
+			}
+			return false;
 		}
 		
 		/**

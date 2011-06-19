@@ -257,6 +257,9 @@
 					autoList[0].dispose(); // dispose will autocall killSound() later
 					return seion_ns::alloc(snd, autodispose);
 				}
+				// Force out an alloc
+				else if (autodispose && Seion.forceAlloc(this))
+					return seion_ns::alloc(snd, autodispose);
 				else // Plea failed. the end.
 					return false;
 			}
@@ -295,6 +298,8 @@
 			{
 				if (borrowedAmt <= 0)	return;
 				sc = autoList[0];
+				sc.dispose(); // which calls killSound() also
+				return;
 			}
 			
 			// proceeding to destroy the ISeionInstance
