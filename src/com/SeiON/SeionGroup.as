@@ -253,7 +253,10 @@
 				}
 				// Cannibalise the autodispose list
 				else if (autoList.length > 0)
+				{
 					autoList[0].dispose(); // dispose will autocall killSound() later
+					return seion_ns::alloc(snd, autodispose);
+				}
 				else // Plea failed. the end.
 					return false;
 			}
