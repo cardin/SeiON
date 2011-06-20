@@ -62,7 +62,7 @@ package com.SeiON
 		public function SeionSample(secretKey:*) {	super(secretKey);	}
 		
 		/** The initialisation function. */
-		protected static function init(ss:SeionSample, name:String, manager:SeionGroup, snd:Sound,
+		private static function init(ss:SeionSample, name:String, manager:SeionGroup, snd:Sound,
 										sampleDuration:int, repeat:int,
 										autodispose:Boolean, sndTransform:SoundTransform):void
 		{

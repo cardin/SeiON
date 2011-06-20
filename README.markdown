@@ -25,7 +25,6 @@ As SeiON only accepts Sound() objects as input, it is most suitable for embedded
 	SeiON.as3proj - FlashDevelop project file
 	
 	test/ - Demo Applications
-	test/BasicTest/lib - Sound assets for demo
 	test/BasicTest/src - Demo source
 	test/BasicTest/src/Components - Demo helper components
 

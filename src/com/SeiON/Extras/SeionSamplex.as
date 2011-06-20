@@ -5,7 +5,7 @@ package com.SeiON.Extras
     import flash.media.Sound;
     import flash.utils.ByteArray;
 
-	import com.SeiON.Core.SeionProperty;
+	import com.SeiON.Core.SeionInstance;
 	
     /*
     // Pitch_Shift_MP3
@@ -24,14 +24,13 @@ package com.SeiON.Extras
 	 * An ISeionInstance that can adjust pitch, and change starting offset, truncation, by specifying
 	 * a byte range.
 	 */
-    public final class SeionBytes extends SeionClip
+    public final class SeionSamplex extends SeionInstance
     {
 		// -- Special Constant --
         private const BLOCK_SIZE: int = 3072;
 		
-		
         private var _mp3: Sound;
-        private var out: Sound;
+        private var _out: Sound;
 		
         private var _target: ByteArray;
         private var _position: Number;
@@ -39,8 +38,7 @@ package com.SeiON.Extras
         private var _skip_bytes_at_start:uint;
         private var _skip_bytes_at_end:uint;
 
-        public function SeionBytes(name:String, manager:SeionGroup, snd:Sound,
-								sndProperties:SeionProperty, autodispose:Boolean, secretKey:*)
+        public function SeionSamplex(secretKey:*)
         {
 			super(name, manager, sndTransform, sndProperties, autodispose, secretKey);
 			
@@ -52,11 +50,19 @@ package com.SeiON.Extras
             _position = 0.0;
             _rate = 0.0;
 			
-            out = new Sound();
-            out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
-            out.play();
+            _out = new Sound();
+            _out.addEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
+            _out.play();
         }
-
+		
+		/** The initialisation function. */
+		private static function init(sb:SeionBytes, name:String, manager:SeionGroup, snd:Sound,
+										rate:Number, repeat:int,
+										autodispose:Boolean, sndTransform:SoundTransform):void
+		{
+			
+		}
+		
         public function get rate(): Number{    return _rate;    }
         public function set rate( value: Number ): void
         {

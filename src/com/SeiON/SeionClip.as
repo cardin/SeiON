@@ -43,7 +43,7 @@
 		public function SeionClip(secretKey:*) {	super(secretKey);	}
 		
 		/** The initialisation function. @private */
-		protected static function init(sc:SeionClip, name:String, manager:SeionGroup, snd:Sound,
+		private static function init(sc:SeionClip, name:String, manager:SeionGroup, snd:Sound,
 									repeat:int,	autodispose:Boolean, sndTransform:SoundTransform,
 									offset:uint, truncate:uint):void
 		{
