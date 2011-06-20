@@ -28,7 +28,7 @@ package com.SeiON.Extras
 	 * An ISeionInstance that can adjust pitch, and change starting offset, truncation, by specifying
 	 * a byte range.
 	 */
-    public final class SeionSamplex extends SeionInstance
+    public final class SeionPitch extends SeionInstance
     {
 		// -- Special Constant --
         private const BLOCK_SIZE:int = 3072;
@@ -63,23 +63,23 @@ package com.SeiON.Extras
 		 *
 		 * @see SeionSamplex#create()
 		 */
-        public function SeionSamplex(secretKey:*)	{	super(secretKey);	}
+        public function SeionPitch(secretKey:*)	{	super(secretKey);	}
 		
 		/** The initialisation function. */
-		private static function init(sb:SeionSamplex, name:String, manager:SeionGroup, snd:Sound,
+		private static function init(sp:SeionPitch, name:String, manager:SeionGroup, snd:Sound,
 										rate:Number, offset:uint, truncate:uint, repeat:int,
 										autodispose:Boolean, sndTransform:SoundTransform):void
 		{
 			// to make it loop nicer you can ignore the first few and last few bytes
-            sb._bytesOffset = offset;
-            sb._bytesTruncate = truncate;
-			sb._rate = sb._oldRate = rate;
+            sp._bytesOffset = offset;
+            sp._bytesTruncate = truncate;
+			sp._rate = sp._oldRate = rate;
 			
-			sb._position = 0.0;
-			sb._out = new Sound();
-            sb._target = new ByteArray();
+			sp._position = 0.0;
+			sp._out = new Sound();
+            sp._target = new ByteArray();
 			
-			SeionInstance.init(sb, name, manager, snd, repeat, autodispose, sndTransform);
+			SeionInstance.init(sp, name, manager, snd, repeat, autodispose, sndTransform);
 		}
 		
 		/**
@@ -94,7 +94,7 @@ package com.SeiON.Extras
 		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
 		 * @param	sndTransform	The fixed internal property for the sound.
 		 *
-		 * @return	A SeionSamplex if allocation was successful. Null if allocation failed, or
+		 * @return	A SeionPitch if allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
 		 *
 		 * @see	SeionInstance#name
@@ -107,7 +107,7 @@ package com.SeiON.Extras
 		 */
 		public static function create(name:String, manager:SeionGroup, snd:Sound,
 						rate:Number, repeat:int,
-						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionSamplex
+						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionPitch
 		{
 			return createExcerpt(name, manager, snd, rate, 0, 0, repeat, autodispose, sndTransform);
 		}
@@ -127,7 +127,7 @@ package com.SeiON.Extras
 		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
 		 * @param	sndTransform	The fixed internal property for the sound.
 		 *
-		 * @return	A SeionSamplex if allocation was successful. Null if allocation failed, or
+		 * @return	A SeionPitch if allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
 		 *
 		 * @see	SeionInstance#name
@@ -140,12 +140,12 @@ package com.SeiON.Extras
 		 */
 		public static function createExcerpt(name:String, manager:SeionGroup, snd:Sound,
 						rate:Number, offset:uint, truncate:uint, repeat:int,
-						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionSamplex
+						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionPitch
 		{
-			var a:SeionSamplex = new SeionSamplex(SeionInstance._secretKey);
+			var a:SeionPitch = new SeionPitch(SeionInstance._secretKey);
 			if (manager.seion_ns::alloc(a, autodispose))
 			{
-				SeionSamplex.init(a, name, manager, snd, rate, offset, truncate, repeat,
+				SeionPitch.init(a, name, manager, snd, rate, offset, truncate, repeat,
 								autodispose, sndTransform);
 				if (autodispose)	a = null;
 			}
@@ -196,10 +196,9 @@ package com.SeiON.Extras
 				_target.clear();
 				_position = 0.0;
 				_paused = false;
-				
-				if (_rate != 0)		_oldRate = _rate; // since _oldRate must always be non-zero
-				_rate = 0;
 			}
+			
+			if (_rate != 0)		_oldRate = _rate; // since _oldRate must always be non-zero
 		}
 		
 		/** Resumes playback of sound. (ISeionControl) */
@@ -227,8 +226,10 @@ package com.SeiON.Extras
 			
 			if (isPlaying)
 			{
-				_paused = true;
+				_sndChannel.stop();
+				_sndChannel = null;
 				_out.removeEventListener(SampleDataEvent.SAMPLE_DATA, sampleData);
+				_paused = true;
 				_target.clear();
 				
 				_oldRate = _rate;
@@ -242,11 +243,18 @@ package com.SeiON.Extras
 		
 		/** Rate of playback of the clip.<p></p>
 		 *
-		 * 1.0 is normal speed; 0.5 is half speed; 2.0 is twice faster. */
+		 * 1.0 is normal speed, 0.5 is half speed, 2.0 is twice faster.<br>
+		 * Range: 0 to 50 (0.005 precision)<p></p>
+		 *
+		 * Rate is tied into pause and resume.<br>
+		 * When rate is set at 0, the sound is paused. Setting it to a value higher than 0 will
+		 * resume it. Likewise, when a sound is paused, rate is 0. Resuming it will give the last
+		 * non-zero rate. */
         public function get rate():Number	{	return _rate;	}
         public function set rate(value:Number):void
 		{
-			value = Math.max(0, value);
+			value = Math.max(0, Math.min(value, 50));
+			value = Math.round(value * 200) / 200;
 			if (value == 0) //pause
 				pause(); // which will handle _oldRate and stuff
 			else if (isPaused) //resume
@@ -259,9 +267,9 @@ package com.SeiON.Extras
 		}
 		
 		/** The approximate delayed starting position. In bytes. */
-		public function get offset():uint	{	return _offset;	}
+		public function get offset():uint	{	return _bytesOffset;	}
 		/** The approximate truncation from the ending position. In bytes. */
-		public function get truncate():uint	{	return _truncate;	}
+		public function get truncate():uint	{	return _bytesTruncate;	}
 		
 		// ------------------------------------- ABSTRACT ----------------------------------
 		

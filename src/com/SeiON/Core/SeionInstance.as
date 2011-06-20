@@ -78,7 +78,7 @@ package com.SeiON.Core
 				+ "access! Please use SeionInstance.create() instead.");
 		}
 		
-		/** The initialisation function. @private */
+		/** The initialisation function. Auto-plays. @private */
 		protected static function init(si:SeionInstance, name:String, manager:SeionGroup, snd:Sound,
 							repeat:int,	autodispose:Boolean, sndTransform:SoundTransform):void
 		{

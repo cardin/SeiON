@@ -189,20 +189,17 @@ package
 		/** Button handler for the 3 buttons */
 		private function buttonHandler(e:Event):void
 		{
-			if (e.type == MouseEvent.CLICK)
-			{
-				switch (e.target) {
-					case play_but:
-						if (_playStatus == STOPPED)	startTest();
-						else	pauseTest();
-						break;
-					case stop_but:
-						stopTest();
-						break;
-					case mode_but:
-						mode = (mode + 1) % 2;
-						break;
-				}
+			switch (e.target) {
+				case play_but:
+					if (_playStatus == STOPPED)	startTest();
+					else	pauseTest();
+					break;
+				case stop_but:
+					stopTest();
+					break;
+				case mode_but:
+					mode = (mode + 1) % 2;
+					break;
 			}
 		}
 	}

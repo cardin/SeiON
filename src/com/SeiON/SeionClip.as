@@ -65,21 +65,20 @@
 		 * @return	A SeionClip is allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
 		 *
-		 * @see	#name
-		 * @see	#repeat
-		 * @see	#soundtransform
-		 * @see	#autodispose
+		 * @see	SeionInstance#name
+		 * @see	SeionInstance#repeat
+		 * @see	SeionInstance#soundtransform
+		 * @see	SeionInstance#autodispose
 		 */
 		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int,
 					autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionClip
 		{
-			var a:SeionClip = createExcerpt(name, manager, snd, repeat, autodispose, sndTransform,
+			return createExcerpt(name, manager, snd, repeat, autodispose, sndTransform,
 											0, 0);
-			return a;
 		}
 		
 		/**
-		 * Creates a sound clip that is shorted.
+		 * Creates a sound clip that can be shortened.
 		 * @param	name	Any name, even a non-unique one.
 		 * @param	manager	The SeionGroup that manages this SeionClip. Immutable.
 		 * @param	snd 	The sound data. Immutable.
@@ -92,10 +91,10 @@
 		 * @return	A SeionClip if allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
 		 *
-		 * @see	#name
-		 * @see	#repeat
-		 * @see	#soundtransform
-		 * @see	#autodispose
+		 * @see	SeionInstance#name
+		 * @see	SeionInstance#repeat
+		 * @see	SeionInstance#soundtransform
+		 * @see	SeionInstance#autodispose
 		 * @see	#offset
 		 * @see	#truncate
 		 */

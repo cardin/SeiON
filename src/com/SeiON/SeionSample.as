@@ -78,16 +78,17 @@ package com.SeiON
 		 * @param	manager	The SeionGroup that manages this SeionSample. Immutable.
 		 * @param	snd 	The sound data. Immutable.
 		 * @param	sampleDuration	The original sample duration.
+		 * @param	repeat			How many times to repeat the clip.
 		 * @param	autodispose		Whether the clip will auto-mark for GC. Immutable.
 		 * @param	sndTransform	The fixed internal property for the sound.
 		 *
 		 * @return	A SeionSample if allocation was successful. Null if allocation failed, or
 		 * autodispose is true.
 		 *
-		 * @see	#name
+		 * @see	SeionInstance#name
 		 * @see #length
-		 * @see #autodispose
-		 * @see #soundtransform
+		 * @see SeionInstance#autodispose
+		 * @see SeionInstance#soundtransform
 		 */
 		public static function createGaplessMP3(name:String, manager:SeionGroup, snd:Sound,
 						sampleDuration:int, repeat:int,
@@ -129,7 +130,7 @@ package com.SeiON
 			super.dispose();
 		}
 		
-		/** Plays the sound from the beginning again according to sndProperties. (ISeionInstance) */
+		/** Plays the sound from the beginning again. (ISeionInstance) */
 		override public function play():void
 		{
 			stop(); // to go to the beginning
@@ -216,14 +217,11 @@ package com.SeiON
 		/** Is the playback paused? (ISeionControl) */
 		override public function get isPaused():Boolean	{	return _paused;	}
 		
-		/** The total <u>sample</u> length of the clip, excluding repeats. <b>NOT</b> in
-		 * milliseconds, but in samples. (ISeionInstance) */
+		/** The total <u>sample</u> length of the clip, excluding repeats. (ISeionInstance) */
 		override public function get length():Number	{	return _samplesTotal;	}
 		
-		/**
-		 * How far into the clip we are. In Milliseconds. (ISeionInstance)
-		 */
-		override public function get position():Number	{	return progress * _snd.length;	}
+		/** How far into the clip we are. In samples. (ISeionInstance) */
+		override public function get position():Number	{	return progress * length;	}
 		
 		/**
 		 * How far into the clip we are, from 0.0 - 1.0. (ISeionInstance) <p></p>

@@ -3,11 +3,15 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
+	import Extras.*;
+	
 	/**
 	 * To test the various demos, substitute variable 'test' with either type:
 	 * 	- AllocationTest
 	 * 	- MP3GaplessTest
 	 *  - TruncationTest
+	 *
+	 *  - PitchShiftTest
 	 */
 	[SWF(width = "400", height = "500", frameRate = "30", backgroundColor = "#808080")]
 	//[SWF(width = "400", height = "300", frameRate = "30", backgroundColor = "#808080")]

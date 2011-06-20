@@ -104,7 +104,8 @@ package
 			descript.mouseEnabled = false;
 			descript.htmlText = "<p align='justify'>SeionClips can vary the starting offset and "
 				+ "duration. Here, shorter sounds are generated using portions of a longer sound. "
-				+ "Note that this feature is not available to SeionSample.</p>";
+				+ "Note that this feature is not available to SeionSample.</p><br>"
+				+ "<p align='center'>Drag the Range Markers to offset and truncate the sound.</p>";
 			descript.x = 25;
 			descript.y = 10;
 			descript.width = 400;
