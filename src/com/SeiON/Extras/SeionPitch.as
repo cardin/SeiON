@@ -59,9 +59,9 @@ package com.SeiON.Extras
 		
 		/**
 		 * Please do not call this constructor directly; it will throw an error. Call it through
-		 * SeionSamplex.create().
+		 * SeionPitch.create().
 		 *
-		 * @see SeionSamplex#create()
+		 * @see SeionPitch#create()
 		 */
         public function SeionPitch(secretKey:*)	{	super(secretKey);	}
 		
