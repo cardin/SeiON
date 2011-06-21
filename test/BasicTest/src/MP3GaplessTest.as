@@ -61,7 +61,7 @@ package
 		{
 			stopTest();
 			
-			if (mode == GAP)	_sndClip = SeionClip.create("", _testGrp, _snd, -1, false);
+			if (_mode == GAP)	_sndClip = SeionClip.create("", _testGrp, _snd, -1, false);
 			else				_sndClip = SeionSample.createGaplessMP3("", _testGrp, _snd, 124510, -1, false);
 			
 			_sndClip.play();

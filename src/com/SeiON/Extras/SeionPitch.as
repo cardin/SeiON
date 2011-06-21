@@ -320,7 +320,7 @@ package com.SeiON.Extras
             var r1: Number;
 			
 			var i:int;
-            for(i = 0; i <= n; i++)
+            for(i = 0; i < n; ++i)
             {
                 if( int( positionTargetNum ) != positionTargetInt )
                 {

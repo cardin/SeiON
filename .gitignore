@@ -1,0 +1,11 @@
+# Exclude all
+/*
+
+# Individual Exceptions
+!/src
+!/test
+
+!.gitignore
+!LICENSE.txt
+!README.markdown
+!SeiON.as3proj

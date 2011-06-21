@@ -248,8 +248,8 @@
 				if (autodispose && Seion.allocation > 0)
 				{
 					// We note down the loan from Seion
-					Seion.allocation--;
-					borrowedAmt++;
+					-- Seion.allocation;
+					++ borrowedAmt;
 				}
 				// Cannibalise the autodispose list
 				else if (autoList.length > 0)
@@ -264,7 +264,7 @@
 					return false;
 			}
 			else
-				availAmt --;
+				-- availAmt;
 			
 			/* ---- Explanation for above choices
 			 * We must cannibalise. Otherwise if allocations were maxed out, new sounds might not be
@@ -313,11 +313,11 @@
 			// If sound is autodisposable, and if we are indebted to Seion, then return it.
 			if (sc.autodispose && borrowedAmt > 0)
 			{
-				Seion.allocation++;
-				borrowedAmt--;
+				++ Seion.allocation;
+				-- borrowedAmt;
 			}
 			else
-				availAmt ++;
+				++ availAmt;
 		}
 		
 		/**
