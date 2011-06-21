@@ -1,5 +1,8 @@
 package com.SeiON.Extras
 {
+	import flash.media.SoundTransform;
+	import flash.media.Sound;
+	
 	import com.SeiON.Core.SeionInstance;
 	import com.SeiON.Core.seion_ns;
 	import com.SeiON.SeionGroup;
@@ -50,7 +53,7 @@ package com.SeiON.Extras
 		 */
 		public static function createExcerpt(name:String, manager:SeionGroup, snd:Sound,
 						manyOfYourOwnParameters:*, repeat:int,
-						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionPitch
+						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionExample
 		{
 			var a:SeionExample = new SeionExample(SeionInstance._secretKey);
 			if (manager.seion_ns::alloc(a, autodispose))
@@ -68,7 +71,7 @@ package com.SeiON.Extras
 		/*****************************************************************************
 		 * 										ABSTRACT
 		 *****************************************************************************/
-		 
+		
 		/** Clears all references held. This object is now invalid. (ISeionInstance) */
 		override public function dispose():void
 		{
@@ -98,4 +101,5 @@ package com.SeiON.Extras
 		public function get length():Number { return 0; }
 		public function get position():Number { return 0; }
 		public function get progress():Number { return 0; } */
-		
+	}
+}
