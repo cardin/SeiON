@@ -16,8 +16,8 @@ As SeiON only accepts Sound() objects as input, it is most suitable for embedded
 
 * Visit the Wiki for Tutorials and stuff: <http://github.com/cardin/SeiON/wiki/>
 * Conventional Download Packages: <http://github.com/cardin/SeiON/downloads>
-* ASDoc pages: <http://cardinal4.co.cc/SeiON/v0.3.0>
-* Compiled Demos: <http://cardinal4.co.cc/SeiON/v0.3.0/Demos>
+* ASDoc pages: <http://cardin.github.com/SeiON/v0.3.0/asdoc>
+* Compiled Demos: <http://cardin.github.com/SeiON/v0.3.0/demos>
 
 ##File Manifest
 
