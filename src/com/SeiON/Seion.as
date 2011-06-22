@@ -5,6 +5,8 @@ package com.SeiON
 	import com.SeiON.Core.Interface.ISeionControl;
 	import com.SeiON.Core.seion_ns;
 	
+	use namespace seion_ns;
+	
 	/**
 	 * Global sound control over whole of SeiON.
 	 * <ol>
@@ -159,7 +161,7 @@ package com.SeiON
 			for each (var sg:SeionGroup in sndGroup)
 			{
 				if (sg == callee)	continue;
-				sg.seion_ns::killSound();
+				sg.killSound();
 				if (allocation != 0)	return true;
 			}
 			return false;

@@ -10,6 +10,8 @@ package com.SeiON
 	import com.SeiON.Core.SeionInstance;
 	import com.SeiON.Core.seion_ns;
 	
+	use namespace seion_ns;
+	
 	/**
 	 * Playback MP3-Loop (gapless)
 	 *
@@ -104,7 +106,7 @@ package com.SeiON
 			 * Return the clip (if any).
 			 */
 			var a:SeionSample = new SeionSample(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a, autodispose))
+			if (manager.alloc(a, autodispose))
 			{
 				SeionSample.init(a, name, manager, snd, sampleDuration, repeat, autodispose,
 								sndTransform);
@@ -126,7 +128,7 @@ package com.SeiON
 			stop();
 			_out = null;
 			
-			_manager.seion_ns::killSound(this);
+			_manager.killSound(this);
 			super.dispose();
 		}
 		

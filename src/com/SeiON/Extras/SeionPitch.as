@@ -10,6 +10,8 @@ package com.SeiON.Extras
 	import com.SeiON.Core.seion_ns;
 	import com.SeiON.SeionGroup;
 	
+	use namespace seion_ns;
+	
     /*
 	 * Adapted from:
 			Pitch_Shift_MP3
@@ -143,7 +145,7 @@ package com.SeiON.Extras
 						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionPitch
 		{
 			var a:SeionPitch = new SeionPitch(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a, autodispose))
+			if (manager.alloc(a, autodispose))
 			{
 				SeionPitch.init(a, name, manager, snd, rate, offset, truncate, repeat,
 								autodispose, sndTransform);
@@ -167,7 +169,7 @@ package com.SeiON.Extras
 			_target.clear();
 			_target = null;
 			
-			_manager.seion_ns::killSound(this);
+			_manager.killSound(this);
 			super.dispose();
 		}
 		

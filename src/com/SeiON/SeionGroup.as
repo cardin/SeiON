@@ -10,6 +10,8 @@
 	import com.SeiON.Core.Interface.ISeionControl;
 	import com.SeiON.Core.Interface.ISeionInstance;
 	
+	use namespace seion_ns;
+	
 	/**
 	 * In charge of organising SeionClips, their playback and properties. On instantiation, the
 	 * no. of sound channels that each SeionGroup is allowed is set individually.<p></p>
@@ -255,11 +257,11 @@
 				else if (autoList.length > 0)
 				{
 					autoList[0].dispose(); // dispose will autocall killSound() later
-					return seion_ns::alloc(snd, autodispose);
+					return alloc(snd, autodispose);
 				}
 				// Force out an alloc
 				else if (autodispose && Seion.forceAlloc(this))
-					return seion_ns::alloc(snd, autodispose);
+					return alloc(snd, autodispose);
 				else // Plea failed. the end.
 					return false;
 			}

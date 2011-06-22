@@ -11,6 +11,8 @@
 	import com.SeiON.Event.SeionEvent;
 	import com.SeiON.SeionGroup;
 	
+	use namespace seion_ns;
+	
 	/**
 	 * The simplest way to play a sound. <p></p>
 	 *
@@ -112,7 +114,7 @@
 			 * Return the clip (if any).
 			 */
 			var a:SeionClip = new SeionClip(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a, autodispose))
+			if (manager.alloc(a, autodispose))
 			{
 				SeionClip.init(a, name, manager, snd, repeat, autodispose, sndTransform, offset,
 								truncate);
@@ -137,7 +139,7 @@
 			// _truncation.stop() alrdy done in dispose's stop() above
 			_truncation = null;
 			
-			_manager.seion_ns::killSound(this);
+			_manager.killSound(this);
 			super.dispose();
 		}
 		

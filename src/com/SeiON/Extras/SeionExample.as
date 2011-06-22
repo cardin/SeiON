@@ -6,7 +6,9 @@ package com.SeiON.Extras
 	import com.SeiON.Core.SeionInstance;
 	import com.SeiON.Core.seion_ns;
 	import com.SeiON.SeionGroup;
-
+	
+	use namespace seion_ns;
+	
 	/**
 	 * An example class that demarcates how to create custom seion sound objects.
 	 */
@@ -56,7 +58,7 @@ package com.SeiON.Extras
 						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionExample
 		{
 			var a:SeionExample = new SeionExample(SeionInstance._secretKey);
-			if (manager.seion_ns::alloc(a, autodispose))
+			if (manager.alloc(a, autodispose))
 			{
 				SeionExample.init(a, name, manager, snd, manyOfYourOwnParameters, repeat,
 								autodispose, sndTransform);
@@ -84,7 +86,7 @@ package com.SeiON.Extras
 			// ...
 			// ...
 			
-			_manager.seion_ns::killSound(this);
+			_manager.killSound(this);
 			super.dispose();
 		}
 		
