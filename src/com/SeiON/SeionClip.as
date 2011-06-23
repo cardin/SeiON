@@ -72,7 +72,7 @@
 		 * @see	SeionInstance#soundtransform
 		 * @see	SeionInstance#autodispose
 		 */
-		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int,
+		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int = 0,
 					autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionClip
 		{
 			return createExcerpt(name, manager, snd, repeat, autodispose, sndTransform,
@@ -101,8 +101,8 @@
 		 * @see	#truncate
 		 */
 		public static function createExcerpt(name:String, manager:SeionGroup, snd:Sound, repeat:int,
-						autodispose:Boolean, sndTransform:SoundTransform,
-						offset:uint, truncate:uint):SeionClip
+						offset:uint, truncate:uint,
+						autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionClip
 		{
 			/**
 			 * Create empty hull of a SeionClip.
