@@ -75,8 +75,7 @@
 		public static function create(name:String, manager:SeionGroup, snd:Sound, repeat:int = 0,
 					autodispose:Boolean = true, sndTransform:SoundTransform = null):SeionClip
 		{
-			return createExcerpt(name, manager, snd, repeat, autodispose, sndTransform,
-											0, 0);
+			return createExcerpt(name, manager, snd, repeat, 0, 0, autodispose, sndTransform);
 		}
 		
 		/**
