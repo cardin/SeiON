@@ -53,8 +53,8 @@ package com.SeiON
 				
 				// <name> <avail/allocation> <isPlaying>
 				output += sg.name + " (" + sg.availAllocation + " / " + sg.fullAllocation + ") ";
-				output += "[" + sg.borrowedAllocation + "]";
-				output += (sg.isPaused ? "\n" : " (p)\n");
+				output += "[Borrowed: " + sg.borrowedAllocation + "]";
+				output += (sg.isPaused ? "\n" : " (paused)\n");
 				
 				// for each ISeionInstance in SeionGroup
 				for each (var obj:Object in arr)
@@ -62,14 +62,13 @@ package com.SeiON
 					output += "     ";
 					// <name> <autoDisposable> <isPlaying> <property name>
 					output += obj.name + " ";
-					output += (obj.ad ? "(ad)" : "   ");
-					output += (obj.playing ? "(p)" : "   ");
-					output += " " + obj.propname + "\n";
+					output += (obj.ad ? "(auto)" : "   ");
+					output += (obj.playing ? "(>>)" : "(||)") + "\n";
 				}
 			}
 			
 			output += "Spare (" + allocation + ")";
-			output = "-------------------/n" + output + "/n-------------------";
+			output = "-------------------\n" + output + "\n-------------------";
 			return output;
 		}
 		

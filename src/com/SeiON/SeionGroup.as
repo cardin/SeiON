@@ -347,7 +347,6 @@
 				stat.name = sc.name;
 				stat.ad = sc.autodispose;
 				stat.playing = sc.isPlaying;
-				stat.propname = sc.name;
 				
 				arr.push(stat);
 			}
@@ -357,7 +356,6 @@
 				stat.name = sc.name;
 				stat.ad = sc.autodispose;
 				stat.playing = sc.isPlaying;
-				stat.propname = sc.name;
 				
 				arr.push(stat);
 			}
