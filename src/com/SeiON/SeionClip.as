@@ -215,7 +215,7 @@
 			// pause is only valid if it were playing in the 1st place
 			if (isPlaying)
 			{
-				_pausedLocation = _sndChannel.position;
+				_pausedLocation = _sndChannel.position % _snd.length;
 				_sndChannel.stop();
 				_sndChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 				_sndChannel = null;
