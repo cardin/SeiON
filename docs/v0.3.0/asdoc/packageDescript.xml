@@ -1,0 +1,39 @@
+<overviews>
+	<packages>
+		<package name="com.SeiON">
+			<shortDescription>
+			<![CDATA[
+				Core SeiON objects that are necessary to generate sound.
+			]]>
+			</shortDescription>
+		</package>
+		<package name="com.SeiON.Core">
+			<shortDescription>
+			<![CDATA[
+				Helper classes and internal infrastructure.
+			]]>
+			</shortDescription>
+		</package>
+		<package name="com.SeiON.Core.Interface">
+			<shortDescription>
+			<![CDATA[
+				Interfaces that define the functionality of many seion classes.
+			]]>
+			</shortDescription>
+		</package>
+		<package name="com.SeiON.Event">
+			<shortDescription>
+			<![CDATA[
+				Events.
+			]]>
+			</shortDescription>
+		</package>
+		<package name="com.SeiON.Extras">
+			<shortDescription>
+			<![CDATA[
+				Extra playback functionality that may be narrow in scope.
+			]]>
+			</shortDescription>
+		</package>
+	</packages>
+</overviews>

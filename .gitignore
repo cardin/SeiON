@@ -4,6 +4,7 @@
 # Individual Exceptions
 !/src
 !/test
+!/docs
 
 !.gitignore
 !LICENSE.txt

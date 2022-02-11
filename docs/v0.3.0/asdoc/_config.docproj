@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<docProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <pageTitle>SeiON: Actionscript 3 Sound Engine</pageTitle>
+  <classPaths>C:\Users\Lenovo\Flash\SeiON\src</classPaths>
+  <sourcesList />
+  <outputDirectory>C:\Users\Lenovo\Flash\SeiON\asdoc</outputDirectory>
+  <activeCompiler>1</activeCompiler>
+  <extraOptions>-package-description-file=packageDescript.xml</extraOptions>
+</docProject>
